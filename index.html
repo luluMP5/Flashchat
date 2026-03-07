@@ -5,300 +5,1383 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Flash ⚡</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;}
+:root{
+  --y:#FFFC00;--yd:#d4d000;
+  --bk:#000;--d1:#0f0f0f;--d2:#1a1a1a;--d3:#252525;--d4:#333;
+  --wh:#fff;--gr:#888;--gr2:#555;
+  --grn:#00D26A;--red:#FF3B3B;--ora:#FF9F0A;--pur:#BF5FFF;--blu:#4A90FF;
+  --f:'Nunito',sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bk);font-family:var(--f);color:var(--wh);}
+
+/* ═══ SCREENS ═══ */
+.scr{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bk);overflow:hidden;}
+.scr.on{display:flex;}
+
+/* ═══ AUTH ═══ */
+#s-auth{align-items:center;justify-content:center;padding:40px 28px;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,252,0,.08),transparent 60%),var(--bk);}
+.logo{font-size:3.6rem;font-weight:900;color:var(--y);letter-spacing:-.02em;margin-bottom:4px;
+  text-shadow:0 0 50px rgba(255,252,0,.3);}
+.tagline{font-size:.86rem;color:var(--gr);font-weight:600;margin-bottom:32px;text-align:center;}
+.tabs{display:flex;width:100%;background:var(--d2);border-radius:14px;padding:4px;margin-bottom:16px;gap:4px;}
+.tab{flex:1;padding:11px;border-radius:11px;border:none;background:transparent;color:var(--gr);
+  font-family:var(--f);font-size:.88rem;font-weight:800;cursor:pointer;transition:all .2s;}
+.tab.on{background:var(--y);color:var(--bk);}
+.fields{width:100%;display:flex;flex-direction:column;gap:9px;margin-bottom:13px;}
+.inp{width:100%;padding:13px 16px;background:var(--d2);border:2px solid transparent;border-radius:13px;
+  color:var(--wh);font-family:var(--f);font-size:.9rem;font-weight:600;outline:none;transition:border-color .2s;}
+.inp:focus{border-color:var(--y);}
+.inp::placeholder{color:var(--gr2);}
+.btn-y{width:100%;padding:14px;background:var(--y);color:var(--bk);border:none;border-radius:13px;
+  font-family:var(--f);font-size:.95rem;font-weight:900;cursor:pointer;transition:all .15s;margin-bottom:0;}
+.btn-y:active{transform:scale(.97);background:var(--yd);}
+.divider{color:var(--gr);font-size:.78rem;margin:11px 0;}
+.btn-d{width:100%;padding:13px;background:var(--d2);color:var(--wh);border:none;border-radius:13px;
+  font-family:var(--f);font-size:.88rem;font-weight:700;cursor:pointer;}
+.btn-d:active{background:var(--d3);}
+.auth-err{color:var(--red);font-size:.8rem;font-weight:700;text-align:center;display:none;margin-top:-4px;}
+
+/* ═══ SHARED BARS ═══ */
+.bar{padding:52px 16px 10px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.bar-logo{font-size:1.45rem;font-weight:900;color:var(--y);flex:1;}
+.bar-title{font-size:1rem;font-weight:900;flex:1;text-align:center;}
+.ibtn{width:38px;height:38px;border-radius:50%;background:var(--d2);border:none;color:var(--wh);
+  font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ibtn:active{background:var(--d3);}
+.slbl{font-size:.69rem;font-weight:800;color:var(--gr);text-transform:uppercase;
+  letter-spacing:.08em;padding:0 16px 7px;flex-shrink:0;}
+
+/* ═══ SEARCH ═══ */
+.sbar{margin:0 14px 12px;display:flex;align-items:center;gap:8px;background:var(--d2);
+  border-radius:13px;padding:10px 14px;flex-shrink:0;}
+.sbar span{color:var(--gr);}
+.sbar input{background:transparent;border:none;outline:none;color:var(--wh);
+  font-family:var(--f);font-size:.86rem;font-weight:600;flex:1;}
+.sbar input::placeholder{color:var(--gr2);}
+
+/* ═══ CHAT LIST ═══ */
+.cscroll{flex:1;overflow-y:auto;padding-bottom:86px;}
+.cscroll::-webkit-scrollbar{display:none;}
+.ci{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;transition:background .1s;}
+.ci:active{background:var(--d2);}
+.av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:.9rem;flex-shrink:0;position:relative;overflow:hidden;}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.dot{position:absolute;bottom:2px;right:2px;width:12px;height:12px;border-radius:50%;
+  border:2px solid var(--bk);z-index:2;}
+.dot.on{background:var(--grn);}.dot.aw{background:var(--ora);}
+.ci-info{flex:1;min-width:0;}
+.ci-name{font-size:.9rem;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ci-prev{font-size:.78rem;color:var(--gr);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ci-prev.u{color:var(--y);font-weight:700;}
+.ci-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.ci-time{font-size:.7rem;color:var(--gr);}
+.nbadge{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.67rem;}
+.nbadge.r{background:var(--red);}.nbadge.g{background:var(--d3);color:var(--gr);}
+
+/* ═══ CONVERSATION ═══ */
+#s-convo{background:var(--bk);}
+/* convo uses full flex column — messages flex:1, input bar fixed at bottom */
+.cbar{padding:50px 14px 10px;display:flex;align-items:center;gap:9px;flex-shrink:0;
+  border-bottom:1px solid var(--d3);}
+.bkbtn{width:36px;height:36px;border-radius:50%;background:var(--d2);border:none;color:var(--wh);
+  font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bkbtn:active{background:var(--d3);}
+.cav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:.76rem;flex-shrink:0;overflow:hidden;}
+.cav img{width:100%;height:100%;object-fit:cover;}
+.cname{font-weight:800;font-size:.9rem;}
+.cstat{font-size:.72rem;color:var(--grn);font-weight:600;}
+.cacts{display:flex;gap:6px;margin-left:auto;}
+.cact{width:34px;height:34px;border-radius:50%;background:var(--d2);border:none;color:var(--wh);
+  font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* messages scroll area */
+.msgs-wrap{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:12px 14px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-height:0;
+}
+.msgs-wrap::-webkit-scrollbar{display:none;}
+.daylbl{text-align:center;font-size:.65rem;color:var(--gr);font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;margin:6px 0;}
+.brow{display:flex;align-items:flex-end;gap:6px;}
+.brow.me{flex-direction:row-reverse;}
+.bav{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.55rem;font-weight:800;flex-shrink:0;overflow:hidden;}
+.bav img{width:100%;height:100%;object-fit:cover;}
+.bub{max-width:74%;padding:10px 13px;border-radius:18px;font-size:.85rem;line-height:1.5;
+  font-weight:500;word-break:break-word;}
+.bub.them{background:var(--d2);border-bottom-left-radius:4px;}
+.bub.me{background:var(--y);color:var(--bk);font-weight:700;border-bottom-right-radius:4px;}
+.bphoto{max-width:74%;border-radius:13px;cursor:pointer;display:block;}
+.btm{font-size:.62rem;color:var(--gr);margin:1px 5px 3px;}
+.btm.me{text-align:right;}
+/* typing */
+.typing-row{display:flex;align-items:center;gap:6px;padding:2px 0;}
+.tdots{background:var(--d2);padding:10px 13px;border-radius:18px;
+  border-bottom-left-radius:4px;display:flex;gap:4px;align-items:center;}
+.td{width:6px;height:6px;border-radius:50%;background:var(--gr);animation:td 1.2s infinite;}
+.td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
+@keyframes td{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+
+/* ─── INPUT BAR — this is the critical piece ─── */
+.ibar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  padding-bottom:max(10px, env(safe-area-inset-bottom, 10px));
+  background:var(--d1);
+  flex-shrink:0;
+  border-top:1px solid var(--d3);
+  position:relative;
+  z-index:10;
+}
+.imbtn{width:38px;height:38px;border-radius:50%;background:var(--d2);border:none;color:var(--wh);
+  font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.imbtn:active{background:var(--d3);}
+.minp{
+  flex:1;
+  background:var(--d3);
+  border:none;
+  border-radius:22px;
+  padding:11px 16px;
+  color:var(--wh);
+  font-family:var(--f);
+  font-size:.87rem;
+  font-weight:600;
+  outline:none;
+  min-width:0;
+  -webkit-appearance:none;
+}
+.minp::placeholder{color:var(--gr2);}
+.sbtn{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--y);border:none;color:var(--bk);
+  font-size:1.2rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-weight:900;
+  transition:all .12s;
+  -webkit-appearance:none;
+}
+.sbtn:active{transform:scale(.88);background:var(--yd);}
+
+/* ═══ CAMERA ═══ */
+#s-cam{background:#000;overflow:hidden;}
+#cvid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
+#ccanv{display:none;}
+.cfb{position:absolute;inset:0;background:linear-gradient(160deg,#0d0d1a,#1a1a3a 50%,#0a1a2e);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.cfb-ring{width:100px;height:100px;border-radius:50%;border:2px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;font-size:2.6rem;}
+.cfb-hint{font-size:.74rem;color:rgba(255,255,255,.25);font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.ctbar{position:absolute;top:0;left:0;right:0;z-index:20;padding:50px 14px 12px;
+  display:flex;align-items:center;justify-content:space-between;}
+.cbtn{width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.42);backdrop-filter:blur(10px);
+  border:none;color:var(--wh);font-size:1rem;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;}
+.cbtn.fy{background:var(--y);color:var(--bk);font-size:.69rem;font-weight:900;width:auto;border-radius:99px;padding:0 13px;}
+.cstrip{position:absolute;bottom:126px;left:0;right:0;z-index:20;
+  display:flex;gap:9px;padding:0 14px;overflow-x:auto;}
+.cstrip::-webkit-scrollbar{display:none;}
+.sthumb{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.sring{width:50px;height:50px;padding:2.5px;border-radius:50%;
+  background:conic-gradient(var(--y) 0%,var(--y) 70%,rgba(255,255,255,.12) 70%);}
+.sri{width:100%;height:100%;border-radius:50%;background:var(--d2);border:2px solid var(--bk);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.78rem;overflow:hidden;}
+.sri img{width:100%;height:100%;object-fit:cover;}
+.stn{font-size:.61rem;color:rgba(255,255,255,.6);font-weight:700;
+  max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;}
+.cbot{position:absolute;bottom:0;left:0;right:0;z-index:20;
+  padding:16px 0 32px;display:flex;align-items:center;justify-content:center;gap:34px;}
+.csb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.36);backdrop-filter:blur(10px);
+  border:none;font-size:1.2rem;color:var(--wh);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;}
+.shutter{width:76px;height:76px;border-radius:50%;border:5px solid rgba(255,255,255,.88);
+  background:transparent;cursor:pointer;position:relative;transition:transform .1s;}
+.shutter::after{content:'';position:absolute;inset:7px;border-radius:50%;
+  background:rgba(255,255,255,.88);transition:all .1s;}
+.shutter:active{transform:scale(.9);}
+.shutter:active::after{background:var(--y);}
+.fov{position:absolute;inset:0;z-index:50;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s;}
+.fov.flash{opacity:1;}
+/* photo preview */
+#prev-wrap{position:absolute;inset:0;z-index:60;display:none;flex-direction:column;}
+#prev-img{flex:1;width:100%;object-fit:cover;min-height:0;}
+.pacts{display:flex;gap:8px;padding:12px 12px 30px;background:rgba(0,0,0,.92);flex-shrink:0;}
+.pa{flex:1;padding:13px 6px;border:none;border-radius:12px;font-family:var(--f);
+  font-size:.82rem;font-weight:800;cursor:pointer;text-align:center;}
+.pa:active{transform:scale(.95);}
+.pa.d{background:var(--d3);color:var(--wh);}
+.pa.p{background:var(--d2);color:var(--wh);}
+.pa.s{background:var(--y);color:var(--bk);}
+
+/* ═══ STORIES ═══ */
+#s-stories{background:var(--bk);}
+.my-sc{margin:0 14px 14px;border-radius:15px;background:var(--d2);border:1px solid var(--d3);
+  cursor:pointer;display:flex;align-items:center;gap:12px;padding:13px;flex-shrink:0;}
+.my-sc:active{opacity:.8;}
+.my-add{width:50px;height:50px;border-radius:50%;background:var(--d3);border:2px dashed var(--d4);
+  display:flex;align-items:center;justify-content:center;font-size:1.35rem;position:relative;flex-shrink:0;}
+.my-plus{position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;background:var(--y);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.68rem;color:var(--bk);font-weight:900;border:2px solid var(--bk);}
+.stlist{flex:1;overflow-y:auto;padding-bottom:86px;}
+.stlist::-webkit-scrollbar{display:none;}
+.sli{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;transition:background .1s;}
+.sli:active{background:var(--d2);}
+.slring{width:54px;height:54px;padding:2.5px;border-radius:50%;flex-shrink:0;
+  background:conic-gradient(var(--y) 0deg,var(--y) 270deg,rgba(255,255,255,.1) 270deg);}
+.slri{width:100%;height:100%;border-radius:50%;border:2.5px solid var(--bk);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.92rem;overflow:hidden;}
+.slri img{width:100%;height:100%;object-fit:cover;}
+.sl-n{font-weight:700;font-size:.9rem;margin-bottom:2px;}
+.sl-t{font-size:.76rem;color:var(--gr);}
+/* story viewer */
+.sv{position:absolute;inset:0;z-index:90;display:none;flex-direction:column;background:var(--bk);}
+.sv.on{display:flex;}
+.sv-prog{display:flex;gap:3px;padding:50px 12px 7px;flex-shrink:0;}
+.sv-seg{flex:1;height:3px;background:rgba(255,255,255,.18);border-radius:2px;overflow:hidden;}
+.sv-fill{height:100%;background:rgba(255,255,255,.9);border-radius:2px;width:0;}
+.sv-hdr{display:flex;align-items:center;gap:9px;padding:7px 12px;flex-shrink:0;}
+.sv-hav{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:.74rem;flex-shrink:0;overflow:hidden;}
+.sv-hav img{width:100%;height:100%;object-fit:cover;}
+.sv-hn{font-weight:800;font-size:.86rem;flex:1;}
+.sv-ht{font-size:.7rem;color:rgba(255,255,255,.45);}
+.sv-close{background:transparent;border:none;color:var(--wh);font-size:1.2rem;cursor:pointer;padding:4px;}
+.sv-cnt{flex:1;position:relative;overflow:hidden;cursor:pointer;}
+.sv-bg{position:absolute;inset:0;}
+.sv-txt{position:relative;z-index:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;height:100%;padding:20px;text-align:center;}
+.sv-e{font-size:3.6rem;margin-bottom:10px;}
+.sv-t{font-size:1.8rem;font-weight:900;text-shadow:0 2px 16px rgba(0,0,0,.6);line-height:1.2;}
+.sv-rep{display:flex;align-items:center;gap:8px;padding:10px 12px 32px;flex-shrink:0;}
+.sv-ri{flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);
+  border-radius:99px;padding:10px 14px;color:var(--wh);font-family:var(--f);font-size:.83rem;outline:none;}
+.sv-ra{background:transparent;border:none;font-size:1.3rem;cursor:pointer;padding:4px;}
+
+/* ═══ DISCOVER ═══ */
+#s-disc{background:var(--bk);overflow:hidden;}
+.dscroll{flex:1;overflow-y:auto;padding-bottom:86px;}
+.dscroll::-webkit-scrollbar{display:none;}
+.cats{display:flex;gap:7px;padding:0 14px 12px;overflow-x:auto;flex-shrink:0;}
+.cats::-webkit-scrollbar{display:none;}
+.cpill{flex-shrink:0;padding:7px 13px;border-radius:99px;font-family:var(--f);
+  font-size:.78rem;font-weight:700;background:var(--d2);color:var(--wh);border:none;cursor:pointer;}
+.cpill.on{background:var(--y);color:var(--bk);}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 14px;}
+.si{border-radius:14px;overflow:hidden;cursor:pointer;position:relative;
+  aspect-ratio:9/14;background:var(--d2);}
+.si:active{opacity:.85;}
+.si:nth-child(3n+1){grid-column:span 2;aspect-ratio:16/9;}
+.si-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.8rem;}
+.si-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75),transparent 55%);}
+.si-info{position:absolute;bottom:0;left:0;right:0;padding:10px;}
+.si-auth{font-size:.7rem;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:2px;}
+.si-cap{font-size:.82rem;font-weight:700;line-height:1.25;}
+.si-stats{display:flex;gap:7px;margin-top:3px;}
+.si-stat{font-size:.67rem;color:rgba(255,255,255,.5);font-weight:600;}
+
+/* ═══ PROFILE ═══ */
+#s-prof{background:var(--d1);overflow:hidden;}
+.prof-bar{padding:50px 16px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pscroll{flex:1;overflow-y:auto;}
+.pscroll::-webkit-scrollbar{display:none;}
+.phero{display:flex;flex-direction:column;align-items:center;padding:16px 16px 0;}
+.pav-w{width:90px;height:90px;border-radius:50%;
+  background:linear-gradient(135deg,var(--y),#ffaa00);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.2rem;font-weight:900;color:var(--bk);
+  box-shadow:0 0 0 4px var(--d1),0 0 0 7px rgba(255,252,0,.4);
+  margin-bottom:11px;cursor:pointer;position:relative;overflow:hidden;}
+.pav-w img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.pcambdg{position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--y);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.66rem;border:2px solid var(--d1);z-index:2;}
+.pname{font-size:1.25rem;font-weight:900;margin-bottom:2px;}
+.phdl{font-size:.82rem;color:var(--gr);font-weight:600;margin-bottom:13px;}
+.pbtns{display:flex;gap:9px;margin-bottom:16px;}
+.pbtn{padding:9px 19px;border-radius:11px;font-family:var(--f);font-size:.82rem;font-weight:800;border:none;cursor:pointer;}
+.pbtn:active{transform:scale(.95);}
+.pbtn.y{background:var(--y);color:var(--bk);}
+.pbtn.d{background:var(--d2);color:var(--wh);}
+.srow{display:flex;background:var(--d2);border-radius:14px;overflow:hidden;margin:0 14px 11px;}
+.stat{flex:1;text-align:center;padding:12px 4px;}
+.stat:not(:last-child){border-right:1px solid var(--d3);}
+.stat .n{font-size:1.12rem;font-weight:900;}
+.stat .l{font-size:.66rem;color:var(--gr);font-weight:700;margin-top:1px;text-transform:uppercase;letter-spacing:.04em;}
+.scard{margin:0 14px 11px;background:var(--d2);border-radius:14px;
+  padding:13px;display:flex;align-items:center;gap:11px;}
+.scl{font-weight:800;font-size:.85rem;margin-bottom:2px;}
+.scv{font-size:1.18rem;font-weight:900;color:var(--y);}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin:0 14px 100px;
+  border-radius:12px;overflow:hidden;}
+.pgc{aspect-ratio:1;background:var(--d2);display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;cursor:pointer;overflow:hidden;}
+.pgc img{width:100%;height:100%;object-fit:cover;}
+
+/* ═══ MODALS ═══ */
+.modal{position:absolute;inset:0;z-index:200;background:rgba(0,0,0,.88);
+  backdrop-filter:blur(14px);display:none;flex-direction:column;
+  align-items:center;justify-content:flex-end;}
+.modal.on{display:flex;}
+.msh{background:var(--d1);width:100%;border-radius:24px 24px 0 0;
+  padding:18px 18px 36px;display:flex;flex-direction:column;gap:12px;
+  animation:su .26s cubic-bezier(.16,1,.3,1);max-height:80vh;overflow-y:auto;}
+.msh::-webkit-scrollbar{display:none;}
+.mhdr{display:flex;align-items:center;justify-content:space-between;}
+.mtit{font-size:1.05rem;font-weight:900;}
+.mcls{width:30px;height:30px;border-radius:50%;background:var(--d2);border:none;
+  color:var(--wh);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.mi{width:100%;padding:12px 15px;background:var(--d2);border:2px solid transparent;border-radius:13px;
+  color:var(--wh);font-family:var(--f);font-size:.88rem;font-weight:600;outline:none;transition:border-color .2s;}
+.mi:focus{border-color:rgba(255,252,0,.5);}
+.mi::placeholder{color:var(--gr2);}
+.mlbl{font-size:.76rem;color:var(--gr);font-weight:700;}
+.ptags{display:flex;flex-wrap:wrap;gap:6px;}
+.ptag{padding:5px 11px;border-radius:99px;font-size:.76rem;font-weight:700;cursor:pointer;}
+.ptag:active{opacity:.7;}
+.fc{display:flex;align-items:center;gap:10px;background:var(--d2);border-radius:13px;padding:12px;}
+.stl{display:flex;flex-direction:column;gap:7px;}
+.sti{display:flex;align-items:center;gap:10px;background:var(--d2);border-radius:12px;
+  padding:11px;cursor:pointer;}
+.sti:active{background:var(--d3);}
+
+/* ═══ FULL PHOTO ═══ */
+#fp{position:absolute;inset:0;z-index:300;background:rgba(0,0,0,.97);
+  display:none;align-items:center;justify-content:center;}
+#fp.on{display:flex;}
+#fp img{max-width:100%;max-height:100%;object-fit:contain;}
+.fp-x{position:absolute;top:54px;right:14px;background:rgba(255,255,255,.12);
+  border:none;color:var(--wh);width:36px;height:36px;border-radius:50%;
+  font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* ═══ NAVBAR ═══ */
+#nav{position:absolute;bottom:0;left:0;right:0;
+  height:80px;
+  background:rgba(0,0,0,.97);backdrop-filter:blur(22px);
+  border-top:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:flex-start;justify-content:space-around;
+  padding-top:11px;z-index:100;}
+.nb{display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:none;border:none;cursor:pointer;padding:2px 10px;transition:transform .12s;}
+.nb:active{transform:scale(.86);}
+.ni{font-size:1.32rem;line-height:1;}
+.ni.cam{width:50px;height:50px;background:var(--y);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:1.38rem;
+  margin-top:-17px;box-shadow:0 4px 18px rgba(255,252,0,.38);}
+.nl{font-size:.59rem;font-weight:800;color:var(--gr);text-transform:uppercase;letter-spacing:.04em;}
+.nb.on .nl{color:var(--y);}
+
+/* ═══ EMPTY STATE ═══ */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 24px;gap:10px;flex:1;text-align:center;}
+.empty .ei{font-size:2.8rem;}
+.empty .et{font-weight:800;font-size:.96rem;}
+.empty .es{font-size:.82rem;color:var(--gr);line-height:1.5;}
+
+/* ═══ TOAST ═══ */
+#toast{position:absolute;bottom:94px;left:50%;transform:translateX(-50%);
+  background:rgba(255,252,0,.92);color:var(--bk);padding:9px 18px;border-radius:99px;
+  font-size:.81rem;font-weight:800;white-space:nowrap;opacity:0;
+  transition:opacity .2s;z-index:500;pointer-events:none;max-width:85%;text-align:center;}
+#toast.on{opacity:1;}
+
+@keyframes su{from{transform:translateY(26px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
 </head>
-  <!-- STATUS BAR -->
-  <div id="status-bar">
-    <span class="time" id="clock-display">9:41</span>
-    <div class="icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+<body>
+
+<!-- ═══ AUTH ═══ -->
+<div class="scr on" id="s-auth">
+  <div class="logo">Flash ⚡</div>
+  <div class="tagline">Partage l'instant, vis le moment</div>
+  <div class="tabs">
+    <button class="tab on" id="t-in"  onclick="switchTab('in')">Connexion</button>
+    <button class="tab"    id="t-up"  onclick="switchTab('up')">Inscription</button>
   </div>
-
-       AUTH SCREEN
-  ══════════════════════════════════ -->
-  <div class="screen active" id="screen-auth">
-    <div class="auth-logo">Flash ⚡</div>
-    <p class="auth-tagline">Partage l'instant, vis le moment</p>
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchAuthMode('login')">Connexion</button>
-      <button class="auth-tab"        onclick="switchAuthMode('register')">Inscription</button>
-    </div>
-
-    <!-- Login fields -->
-    <div class="auth-fields" id="auth-login-fields">
-      <input class="auth-input" id="login-id"       placeholder="Pseudo ou email" value="demo" autocomplete="username">
-      <input class="auth-input" id="login-password" placeholder="Mot de passe"   value="demo" type="password" autocomplete="current-password">
-    </div>
-
-    <!-- Register fields -->
-    <div class="auth-fields" id="auth-register-fields" style="display:none">
-      <input class="auth-input" id="reg-name"     placeholder="Ton prénom et nom">
-      <input class="auth-input" id="reg-handle"   placeholder="@pseudo unique">
-      <input class="auth-input" id="reg-email"    placeholder="Email" type="email" autocomplete="email">
-      <input class="auth-input" id="reg-password" placeholder="Mot de passe (min. 6 car.)" type="password" autocomplete="new-password">
-    </div>
-
-    <button class="auth-btn-primary" id="auth-submit-btn" onclick="submitAuth()">Se connecter</button>
-    <p class="auth-divider">— ou continuer avec —</p>
-    <button class="auth-btn-secondary" onclick="submitAuth()">📱 Google</button>
+  <div class="fields" id="f-in">
+    <input class="inp" id="in-hdl" placeholder="@pseudo">
+    <input class="inp" id="in-pw"  type="password" placeholder="Mot de passe">
   </div>
+  <div class="fields" id="f-up" style="display:none">
+    <input class="inp" id="up-name"  placeholder="Prénom et nom">
+    <input class="inp" id="up-hdl"   placeholder="@pseudo (unique)">
+    <input class="inp" id="up-pw"    type="password" placeholder="Mot de passe">
+    <input class="inp" id="up-pw2"   type="password" placeholder="Confirmer le mot de passe">
+  </div>
+  <div class="auth-err" id="auth-err"></div>
+  <button class="btn-y" id="auth-btn" onclick="doAuth()" style="margin-top:2px">Se connecter</button>
+  <div class="divider">— ou —</div>
+  <button class="btn-d" onclick="doDemo()">Essayer sans compte (démo)</button>
+</div>
 
-       APP WRAPPER (shown after auth)
-  ══════════════════════════════════ -->
-  <div id="app-wrapper" style="display:none; position:absolute; inset:0;">
+<!-- ═══ APP ═══ -->
+<div id="app" style="display:none;position:absolute;inset:0;">
 
-         CHAT LIST
-    ══════════════════════════════ -->
-    <div class="screen active" id="screen-chat">
-      <div class="topbar">
-        <span class="topbar-logo">Flash ⚡</span>
-        <button class="icon-btn" onclick="openAddFriendModal()" title="Ajouter un ami">➕</button>
-        <button class="icon-btn" onclick="showToast('🔍 Recherche')">🔍</button>
-      </div>
-      <div class="search-bar">
-        <span>🔍</span>
-        <input placeholder="Rechercher dans les messages..." oninput="filterChatList(this.value)" id="chat-search-input">
-      </div>
-      <div class="section-label">Messages</div>
-      <div class="chat-scroll" id="chat-list-container"></div>
+<!-- ── CHAT LIST ── -->
+<div class="scr on" id="s-chat">
+  <div class="bar">
+    <span class="bar-logo">Flash ⚡</span>
+    <button class="ibtn" onclick="openAddModal()" title="Ajouter un ami">➕</button>
+    <button class="ibtn" onclick="toast('🔍 Recherche globale')">🔍</button>
+  </div>
+  <div class="sbar">
+    <span style="font-size:.9rem">🔍</span>
+    <input id="chat-search" placeholder="Rechercher..." oninput="filterChats(this.value)">
+  </div>
+  <div class="slbl" id="chat-lbl">MESSAGES</div>
+  <div class="cscroll" id="chat-list"></div>
+</div>
+
+<!-- ── CONVERSATION ── -->
+<div class="scr" id="s-convo">
+  <div class="cbar">
+    <button class="bkbtn" onclick="go('chat')">←</button>
+    <div id="convo-hdr" style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;"></div>
+    <div class="cacts">
+      <button class="cact" onclick="toast('📷 Snap !')">📷</button>
+      <button class="cact" onclick="toast('📞 Appel')">📞</button>
+      <button class="cact" onclick="toast('📹 Vidéo')">📹</button>
     </div>
+  </div>
+  <div class="msgs-wrap" id="msgs"></div>
+  <div class="ibar">
+    <button class="imbtn" onclick="document.getElementById('fmsg').click()" title="Envoyer une photo">📎</button>
+    <input id="fmsg" type="file" accept="image/*" style="display:none" onchange="sendPhoto(this)">
+    <input class="minp" id="minp" placeholder="Envoyer un message..." autocomplete="off" spellcheck="false">
+    <button class="sbtn" id="sbtn">⚡</button>
+  </div>
+</div>
 
-         CONVERSATION
-    ══════════════════════════════ -->
-    <div class="screen" id="screen-convo">
-      <div class="convo-topbar">
-        <button class="back-btn" onclick="navigateTo('chat')">←</button>
-        <div class="convo-user" id="convo-header-user"></div>
-        <div class="convo-actions">
-          <button class="convo-action-btn" onclick="showToast('📷 Snap envoyé !')">📷</button>
-          <button class="convo-action-btn" onclick="showToast('📞 Appel en cours...')">📞</button>
-          <button class="convo-action-btn" onclick="showToast('📹 Vidéo démarrée')">📹</button>
-        </div>
-      </div>
-      <div class="messages-area" id="messages-container"></div>
-      <div class="input-bar">
-        <button class="media-btn" onclick="document.getElementById('convo-file-input').click()" title="Envoyer une photo">📎</button>
-        <input type="file" id="convo-file-input" accept="image/*" style="display:none" onchange="handleConvoFilePhoto(this)">
-        <input class="msg-input" id="message-input" placeholder="Envoyer un message..." autocomplete="off" spellcheck="false">
-        <button class="send-btn" id="send-message-btn" onclick="sendMessage()">⚡</button>
-      </div>
+<!-- ── CAMERA ── -->
+<div class="scr" id="s-cam">
+  <video id="cvid" autoplay playsinline muted></video>
+  <canvas id="ccanv"></canvas>
+  <div class="cfb" id="cfb">
+    <div class="cfb-ring">📷</div>
+    <span class="cfb-hint">Appuie pour capturer</span>
+    <span style="font-size:.69rem;color:rgba(255,255,255,.18);font-weight:600;margin-top:2px">ou galerie 🖼️</span>
+  </div>
+  <div id="prev-wrap">
+    <img id="prev-img" src="" alt="">
+    <div class="pacts">
+      <button class="pa d" onclick="discardPhoto()">🗑 Jeter</button>
+      <button class="pa p" onclick="setAsProfile()">👤 Profil</button>
+      <button class="pa s" onclick="openSendModal()">⚡ Envoyer</button>
     </div>
+  </div>
+  <div class="ctbar">
+    <button class="cbtn" onclick="toast('⚡ Flash non disponible sur navigateur')">⚡</button>
+    <button class="cbtn fy" onclick="toast('✨ Filtres bientôt !')">✨ Filtres</button>
+    <button class="cbtn" onclick="flipCam()">🔄</button>
+  </div>
+  <div class="cstrip" id="cstrip"></div>
+  <div class="cbot">
+    <button class="csb" onclick="document.getElementById('gallery').click()">🖼️</button>
+    <button class="shutter" onclick="captureSnap()"></button>
+    <button class="csb" onclick="toast('🎥 Vidéo bientôt !')">🎥</button>
+  </div>
+  <div class="fov" id="fov"></div>
+  <input type="file" id="gallery" accept="image/*" style="display:none" onchange="gallerySnap(this)">
+</div>
 
-         CAMERA
-    ══════════════════════════════ -->
-    <div class="screen" id="screen-camera">
-      <video id="cam-video" autoplay playsinline muted></video>
-      <canvas id="cam-canvas"></canvas>
-      <div id="cam-fallback">
-        <div class="cam-ring">📷</div>
-        <span class="cam-hint">Caméra non disponible</span>
-      </div>
-
-      <!-- Photo preview (after snap) -->
-      <div id="photo-preview">
-        <img id="preview-photo" src="" alt="Aperçu du snap">
-        <div class="preview-actions">
-          <button class="preview-btn discard"    onclick="discardCapturedPhoto()">🗑 Jeter</button>
-          <button class="preview-btn to-profile" onclick="setCapturAsProfilePhoto()">👤 Profil</button>
-          <button class="preview-btn send-snap"  onclick="openSendSnapModal()">⚡ Envoyer</button>
-        </div>
-      </div>
-
-      <div class="camera-topbar">
-        <button class="cam-btn" id="flash-toggle-btn" onclick="toggleCameraFlash()">⚡</button>
-        <button class="cam-btn filters" onclick="showToast('✨ Filtres bientôt !')">✨ Filtres</button>
-        <button class="cam-btn" onclick="flipCamera()">🔄</button>
-      </div>
-
-      <div id="cam-stories-strip"></div>
-
-      <div class="camera-bottom">
-        <button class="cam-side-btn" onclick="document.getElementById('gallery-file-input').click()" title="Galerie">🖼️</button>
-        <button class="shutter-btn" onclick="captureSnap()" id="shutter-btn"></button>
-        <button class="cam-side-btn" onclick="showToast('🎥 Vidéo bientôt !')">🎥</button>
-      </div>
-
-      <div id="flash-overlay"></div>
-      <input type="file" id="gallery-file-input" accept="image/*" style="display:none" onchange="loadPhotoFromGallery(this)">
+<!-- ── STORIES ── -->
+<div class="scr" id="s-stories">
+  <div class="bar">
+    <span class="bar-logo">Flash ⚡</span>
+    <button class="ibtn" onclick="toast('⚙️ Paramètres')">⚙️</button>
+  </div>
+  <div class="my-sc" onclick="toast('📸 Prends une photo pour l\'ajouter !')">
+    <div class="my-add">📷<div class="my-plus">+</div></div>
+    <div>
+      <div style="font-weight:800;font-size:.9rem">Ma Story</div>
+      <div style="color:var(--gr);font-size:.76rem;margin-top:2px">Ajoute à ta story</div>
     </div>
-
-         STORIES
-    ══════════════════════════════ -->
-    <div class="screen" id="screen-stories">
-      <div class="topbar">
-        <span class="topbar-logo">Flash ⚡</span>
-        <button class="icon-btn" onclick="showToast('⚙️ Paramètres')">⚙️</button>
-      </div>
-      <div class="my-story-card" onclick="showToast('📸 Ajoute à ta story depuis la caméra !')">
-        <div class="my-story-add">
-          📷
-          <div class="add-plus">+</div>
-        </div>
-        <div>
-          <div class="my-story-title">Ma Story</div>
-          <div class="my-story-sub">Ajouter un snap à ma story</div>
-        </div>
-      </div>
-      <div class="section-label">Stories d'amis</div>
-      <div class="stories-list" id="stories-list-container"></div>
-
-      <!-- Story viewer overlay -->
-      <div id="story-viewer">
-        <div class="story-progress" id="story-progress-bar"></div>
-        <div class="story-topbar-inner" id="story-topbar-content"></div>
-        <div class="story-content" id="story-content-area" onclick="advanceStory()"></div>
-        <div class="story-reply-bar">
-          <input class="story-reply-input" placeholder="Répondre à cette story...">
-          <button class="story-action-btn" onclick="showToast('❤️')">❤️</button>
-          <button class="story-action-btn" onclick="showToast('📤')">📤</button>
-        </div>
-      </div>
+  </div>
+  <div class="slbl">STORIES D'AMIS</div>
+  <div class="stlist" id="stlist"></div>
+  <div class="sv" id="sv">
+    <div class="sv-prog" id="sv-prog"></div>
+    <div class="sv-hdr"  id="sv-hdr"></div>
+    <div class="sv-cnt"  id="sv-cnt" onclick="nextSlide()"></div>
+    <div class="sv-rep">
+      <input class="sv-ri" placeholder="Répondre...">
+      <button class="sv-ra" onclick="toast('❤️')">❤️</button>
+      <button class="sv-ra" onclick="toast('📤')">📤</button>
     </div>
+  </div>
+</div>
 
-         DISCOVER
-    ══════════════════════════════ -->
-    <div class="screen" id="screen-discover">
-      <div class="topbar">
-        <span class="topbar-logo">Flash ⚡</span>
-        <button class="icon-btn">🔥</button>
+<!-- ── DISCOVER ── -->
+<div class="scr" id="s-disc">
+  <div class="bar">
+    <span class="bar-logo">Flash ⚡</span>
+    <button class="ibtn">🔥</button>
+  </div>
+  <div class="cats" id="cats"></div>
+  <div class="dscroll">
+    <div class="sgrid" id="sgrid"></div>
+  </div>
+</div>
+
+<!-- ── PROFILE ── -->
+<div class="scr" id="s-prof">
+  <div class="prof-bar">
+    <div style="width:36px"></div>
+    <span class="bar-title" id="p-hdl-top">@moi</span>
+    <button class="ibtn" onclick="toast('⚙️')">⚙️</button>
+  </div>
+  <div class="pscroll">
+    <div class="phero">
+      <div class="pav-w" id="pav" onclick="document.getElementById('pic-inp').click()">
+        <span id="p-init">?</span>
+        <div class="pcambdg">📷</div>
       </div>
-      <div class="categories" id="categories-container"></div>
-      <div class="discover-scroll">
-        <div class="spotlight-grid" id="spotlight-grid"></div>
-      </div>
-    </div>
-
-         PROFILE
-    ══════════════════════════════ -->
-    <div class="screen" id="screen-profile">
-      <div class="profile-topbar">
-        <div style="width:36px"></div>
-        <div class="profile-username-top" id="profile-top-username">flashuser</div>
-        <button class="icon-btn" onclick="showToast('⚙️ Paramètres')">⚙️</button>
-      </div>
-      <div class="profile-scroll">
-        <div class="profile-hero">
-          <div class="profile-bitmoji" id="profile-avatar" onclick="document.getElementById('profile-photo-input').click()" title="Changer la photo de profil">
-            <span id="profile-initials-text">JD</span>
-            <div class="profile-cam-badge">📷</div>
-          </div>
-          <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="handleProfilePhotoChange(this)">
-          <div class="profile-display-name" id="profile-display-name">Jean Dupont</div>
-          <div class="profile-handle" id="profile-handle-text">@jeandupont</div>
-          <div class="profile-btns">
-            <button class="profile-btn primary"   onclick="editProfileName()">✏️ Modifier</button>
-            <button class="profile-btn secondary" onclick="showToast('🔗 Lien copié !')">🔗 Partager</button>
-          </div>
-        </div>
-
-        <div class="profile-stats">
-          <div class="stat-cell">
-            <div class="stat-num" id="profile-snap-count">0</div>
-            <div class="stat-lbl">Snaps</div>
-          </div>
-          <div class="stat-cell">
-            <div class="stat-num" id="profile-friend-count">7</div>
-            <div class="stat-lbl">Amis</div>
-          </div>
-          <div class="stat-cell">
-            <div class="stat-num">1.2k</div>
-            <div class="stat-lbl">Vues</div>
-          </div>
-        </div>
-
-        <div class="flash-score-card">
-          <div class="score-icon">⚡</div>
-          <div>
-            <div class="score-label">Flash Score</div>
-            <div class="score-value" id="flash-score-display">8,420</div>
-          </div>
-          <div class="score-rank">Top 15% 🏆</div>
-        </div>
-
-        <div class="section-label" style="margin-top:6px">Mes Snaps récents</div>
-        <div class="snap-grid" id="snap-grid-container"></div>
+      <input type="file" id="pic-inp" accept="image/*" style="display:none" onchange="changePic(this)">
+      <div class="pname" id="p-name">Utilisateur</div>
+      <div class="phdl"  id="p-hdl">@utilisateur</div>
+      <div class="pbtns">
+        <button class="pbtn y" onclick="openEditModal()">✏️ Modifier</button>
+        <button class="pbtn d" onclick="toast('🔗 Lien copié !')">🔗 Partager</button>
       </div>
     </div>
+    <div class="srow">
+      <div class="stat"><div class="n" id="s-snaps">0</div><div class="l">Snaps</div></div>
+      <div class="stat"><div class="n" id="s-friends">0</div><div class="l">Amis</div></div>
+      <div class="stat"><div class="n" id="s-views">0</div><div class="l">Vues</div></div>
+    </div>
+    <div class="scard">
+      <span style="font-size:1.8rem">⚡</span>
+      <div><div class="scl">Flash Score</div><div class="scv" id="s-score">0</div></div>
+      <div style="margin-left:auto;font-size:.72rem;color:var(--gr);font-weight:700" id="s-rank"></div>
+    </div>
+    <div class="slbl" style="margin-top:6px">MES SNAPS RÉCENTS</div>
+    <div class="pgrid" id="pgrid"></div>
+  </div>
+</div>
 
-         ADD FRIEND MODAL
-    ══════════════════════════════ -->
-    <div class="modal-overlay" id="add-friend-modal">
-      <div class="modal-sheet">
-        <div class="modal-header">
-          <span class="modal-title">Ajouter un ami ➕</span>
-          <button class="modal-close" onclick="closeAddFriendModal()">✕</button>
-        </div>
-        <input
-          class="modal-input"
-          id="add-friend-input"
-          placeholder="@pseudo de ton ami"
-          oninput="handleAddFriendSearch(this.value)"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();confirmAddFriend();}"
-          autocomplete="off"
-        >
-        <div id="add-friend-result">
-          <p style="color:var(--grey);font-size:.82rem;font-weight:600;text-align:center;padding:10px 0">
-            Tape un @pseudo pour rechercher
-          </p>
-        </div>
-        <div>
-          <div style="font-size:.8rem;color:var(--grey);font-weight:700;margin-bottom:8px">
-            Pseudos disponibles :
-          </div>
-          <div id="available-pseudos-list" style="display:flex;flex-wrap:wrap;gap:7px"></div>
-        </div>
-        <button class="modal-confirm-btn" onclick="confirmAddFriend()">Ajouter ⚡</button>
+<!-- ═══ MODALS ═══ -->
+
+<!-- Add friend -->
+<div class="modal" id="m-add">
+  <div class="msh">
+    <div class="mhdr">
+      <span class="mtit">Ajouter un ami ➕</span>
+      <button class="mcls" onclick="closeM('m-add')">✕</button>
+    </div>
+    <div class="mlbl">Entre le @pseudo exact de ton ami</div>
+    <input class="mi" id="add-inp"
+      placeholder="@pseudo"
+      oninput="searchFriend(this.value)"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();doAdd();}">
+    <div id="add-res">
+      <div style="color:var(--gr);font-size:.8rem;font-weight:600;text-align:center;padding:4px 0">
+        💡 Ton ami doit avoir créé un compte sur Flash ⚡
       </div>
     </div>
+    <button class="btn-y" onclick="doAdd()">Ajouter ⚡</button>
+  </div>
+</div>
 
-         SEND SNAP MODAL
-    ══════════════════════════════ -->
-    <div class="modal-overlay" id="send-snap-modal">
-      <div class="modal-sheet">
-        <div class="modal-header">
-          <span class="modal-title">Envoyer le snap à...</span>
-          <button class="modal-close" onclick="closeSendSnapModal()">✕</button>
-        </div>
-        <img id="send-snap-preview" src="" alt="Aperçu" style="width:100%;height:130px;object-fit:cover;border-radius:14px;flex-shrink:0;">
-        <div id="send-snap-friend-list"></div>
+<!-- Send snap -->
+<div class="modal" id="m-send">
+  <div class="msh">
+    <div class="mhdr">
+      <span class="mtit">Envoyer à...</span>
+      <button class="mcls" onclick="closeM('m-send')">✕</button>
+    </div>
+    <img id="snap-prev" src="" style="width:100%;height:120px;object-fit:cover;border-radius:12px;flex-shrink:0;">
+    <div class="stl" id="send-list"></div>
+  </div>
+</div>
+
+<!-- Edit profile -->
+<div class="modal" id="m-edit">
+  <div class="msh">
+    <div class="mhdr">
+      <span class="mtit">Modifier le profil ✏️</span>
+      <button class="mcls" onclick="closeM('m-edit')">✕</button>
+    </div>
+    <div class="mlbl">Nom affiché</div>
+    <input class="mi" id="e-name" placeholder="Ton nom">
+    <div class="mlbl">@Pseudo</div>
+    <input class="mi" id="e-hdl"  placeholder="ton_pseudo">
+    <button class="btn-y" onclick="saveEdit()">Enregistrer ✅</button>
+  </div>
+</div>
+
+<!-- Full photo -->
+<div id="fp">
+  <img id="fp-img" src="" alt="">
+  <button class="fp-x" onclick="closeFP()">✕</button>
+</div>
+
+<!-- Navbar -->
+<div id="nav">
+  <button class="nb on" id="nb-chat"    onclick="go('chat')">
+    <span class="ni">💬</span><span class="nl">Chat</span>
+  </button>
+  <button class="nb"    id="nb-stories" onclick="go('stories')">
+    <span class="ni">📖</span><span class="nl">Stories</span>
+  </button>
+  <button class="nb"    id="nb-cam"     onclick="go('cam')">
+    <span class="ni cam">📷</span>
+  </button>
+  <button class="nb"    id="nb-disc"    onclick="go('disc')">
+    <span class="ni">🔍</span><span class="nl">Discover</span>
+  </button>
+  <button class="nb"    id="nb-prof"    onclick="go('prof')">
+    <span class="ni">👤</span><span class="nl">Profil</span>
+  </button>
+</div>
+
+<div id="toast"></div>
+</div><!-- /app -->
+
+<script>
+'use strict';
+/* ══════════════════════════════════════════════════════════════
+   FLASH ⚡  —  Réseau social avec comptes locaux
+   Les comptes sont stockés dans localStorage du navigateur.
+   Chaque utilisateur peut créer un compte et retrouver ses
+   données sur le même appareil / navigateur.
+══════════════════════════════════════════════════════════════ */
+
+// ── STORAGE ──────────────────────────────────────────────────
+// Tous les comptes enregistrés : { handle -> { name, handle, pw, pic, score, snaps } }
+function loadAccounts() {
+  try { return JSON.parse(localStorage.getItem('flash_accounts') || '{}'); } catch { return {}; }
+}
+function saveAccounts(data) {
+  try { localStorage.setItem('flash_accounts', JSON.stringify(data)); } catch {}
+}
+function loadMyData(handle) {
+  try { return JSON.parse(localStorage.getItem('flash_me_' + handle) || 'null'); } catch { return null; }
+}
+function saveMyData(handle, data) {
+  try { localStorage.setItem('flash_me_' + handle, JSON.stringify(data)); } catch {}
+}
+
+// ── ÉTAT ─────────────────────────────────────────────────────
+let ME = null;          // compte connecté
+let CHATS = [];         // [{ id, handle, name, pic, status, preview, time, unread }]
+let MSGS  = {};         // { chatId: [{from,text?,photo?,time}] }
+const S = {
+  screen:'chat', convoId:null,
+  camStream:null, facing:'environment',
+  capturedPhoto:null,
+  recentSnaps:[],
+  snapCount:0, score:0,
+  story:null, slideIdx:0, storyTimer:null,
+  pendingAdd:null,
+};
+
+// ── UTILITAIRES ───────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const now = () => { const d=new Date(); return `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`; };
+
+const REPLIES = [
+  '😂','Hahaha !','Trop drôle 💀','Ok je vois 👀','🔥🔥',
+  'Exactement !','Wesh !','💯','Oh non 😭','Trop bien !',
+  'Attends 📸','Trop fort !!','Allez 🙌','👀','lol','C\'est chaud 🥶','GG !!',
+  'Ah ouais !','😭','Non sérieux ??',
+];
+
+const SPOTS = [
+  { emoji:'🏄', bg:'linear-gradient(135deg,#1a1a2e,#4a90d9)', auth:'@surfdude',  cap:'Session de folie !',  v:'42k', l:'8.2k' },
+  { emoji:'🎨', bg:'linear-gradient(135deg,#2d1b69,#e94057)', auth:'@artvibes',  cap:'Nouvelle œuvre 🎨',   v:'18k', l:'3.1k' },
+  { emoji:'🌆', bg:'linear-gradient(135deg,#0f0c29,#302b63)', auth:'@citypics',  cap:'Paris de nuit ✨',     v:'95k', l:'21k'  },
+  { emoji:'🎵', bg:'linear-gradient(135deg,#fc4a1a,#f7b733)', auth:'@musiclvr',  cap:'Beat du jour 🎵',      v:'31k', l:'6.8k' },
+  { emoji:'🍜', bg:'linear-gradient(135deg,#134e5e,#71b280)', auth:'@foodieX',   cap:'Ramen maison 🍜',      v:'12k', l:'2.4k' },
+  { emoji:'💃', bg:'linear-gradient(135deg,#c94b4b,#4b134f)', auth:'@dancer99',  cap:'Chorée terminée !',    v:'78k', l:'15k'  },
+];
+
+const STORY_BKGS = [
+  'linear-gradient(135deg,#1a1a2e,#e94057)',
+  'linear-gradient(135deg,#0f0c29,#302b63)',
+  'linear-gradient(135deg,#134e5e,#71b280)',
+  'linear-gradient(135deg,#fc4a1a,#f7b733)',
+  'linear-gradient(135deg,#2d1b69,#11998e)',
+];
+
+let _tt;
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('on'), 2600);
+}
+function openM(id)  { $(id).classList.add('on');  }
+function closeM(id) { $(id).classList.remove('on'); }
+function showErr(msg) {
+  const el = $('auth-err');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideErr() { $('auth-err').style.display = 'none'; }
+
+function initials(name) {
+  return name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2) || '??';
+}
+function avatarColor(handle) {
+  const COLORS = ['#FF6B6B','#A78BFA','#34D399','#FF9F0A','#60A5FA','#F472B6','#FBBF24','#38BDF8','#A3E635','#FB923C'];
+  let h = 0;
+  for (const c of handle) h = (h * 31 + c.charCodeAt(0)) & 0xFFFF;
+  return COLORS[h % COLORS.length];
+}
+
+function makeAv(handle, name, pic, size=50) {
+  const s = size+'px', fs = Math.round(size*.32)+'px';
+  const ini = initials(name), col = avatarColor(handle);
+  if (pic) return `<div style="width:${s};height:${s};border-radius:50%;overflow:hidden;flex-shrink:0;"><img src="${pic}" style="width:100%;height:100%;object-fit:cover;display:block;"></div>`;
+  return `<div style="width:${s};height:${s};border-radius:50%;background:${col}22;color:${col};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:${fs};flex-shrink:0;">${ini}</div>`;
+}
+
+function pushSnap(data) {
+  S.recentSnaps.unshift(data);
+  if (S.recentSnaps.length > 9) S.recentSnaps.pop();
+}
+
+// ── AUTH ─────────────────────────────────────────────────────
+let authTab = 'in';
+function switchTab(t) {
+  authTab = t;
+  $('t-in').classList.toggle('on', t==='in');
+  $('t-up').classList.toggle('on', t==='up');
+  $('f-in').style.display = t==='in' ? 'flex' : 'none';
+  $('f-up').style.display = t==='up' ? 'flex' : 'none';
+  $('auth-btn').textContent = t==='in' ? 'Se connecter' : 'Créer mon compte';
+  hideErr();
+}
+
+function doAuth() {
+  hideErr();
+  const accounts = loadAccounts();
+
+  if (authTab === 'up') {
+    // ── INSCRIPTION ──
+    const name = $('up-name').value.trim();
+    const hdl  = $('up-hdl').value.trim().replace(/^@/, '').toLowerCase();
+    const pw   = $('up-pw').value;
+    const pw2  = $('up-pw2').value;
+    if (!name)        { showErr('Entre ton nom !'); return; }
+    if (!hdl)         { showErr('Entre un @pseudo !'); return; }
+    if (!/^[a-z0-9_]{2,20}$/.test(hdl)) { showErr('Pseudo : lettres, chiffres, _ (2-20 caractères)'); return; }
+    if (!pw)          { showErr('Entre un mot de passe !'); return; }
+    if (pw.length < 4){ showErr('Mot de passe trop court (min 4 car.)'); return; }
+    if (pw !== pw2)   { showErr('Les mots de passe ne correspondent pas !'); return; }
+    if (accounts[hdl]){ showErr('@' + hdl + ' est déjà pris !'); return; }
+    // Créer le compte
+    accounts[hdl] = { name, handle:hdl, pw, pic:null };
+    saveAccounts(accounts);
+    login({ name, handle:hdl, pic:null });
+
+  } else {
+    // ── CONNEXION ──
+    const hdl = $('in-hdl').value.trim().replace(/^@/, '').toLowerCase();
+    const pw  = $('in-pw').value;
+    if (!hdl) { showErr('Entre ton @pseudo !'); return; }
+    if (!pw)  { showErr('Entre ton mot de passe !'); return; }
+    const acc = accounts[hdl];
+    if (!acc)       { showErr('Compte @' + hdl + ' introuvable'); return; }
+    if (acc.pw !== pw) { showErr('Mot de passe incorrect'); return; }
+    login({ name:acc.name, handle:hdl, pic:acc.pic || null });
+  }
+}
+
+function doDemo() {
+  // Compte démo sans inscription
+  login({ name:'Utilisateur Démo', handle:'demo_' + Date.now().toString(36), pic:null, demo:true });
+}
+
+function login(user) {
+  ME = user;
+  // Charger les données persistantes (chats, snaps, score)
+  const saved = loadMyData(ME.handle);
+  if (saved) {
+    CHATS        = saved.chats    || [];
+    MSGS         = saved.msgs     || {};
+    S.recentSnaps = saved.snaps   || [];
+    S.snapCount   = saved.snapCount || 0;
+    S.score       = saved.score     || 0;
+    if (saved.pic) ME.pic = saved.pic;
+  } else {
+    CHATS = []; MSGS = {}; S.recentSnaps = []; S.snapCount = 0; S.score = 0;
+  }
+  $('s-auth').classList.remove('on');
+  $('app').style.display = 'block';
+  initApp();
+  go('chat');
+}
+
+function saveState() {
+  if (!ME || ME.demo) return;
+  saveMyData(ME.handle, {
+    chats: CHATS, msgs: MSGS,
+    snaps: S.recentSnaps, snapCount: S.snapCount, score: S.score,
+    pic: ME.pic || null,
+  });
+  // Mettre à jour la photo dans les comptes
+  if (ME.pic) {
+    const acc = loadAccounts();
+    if (acc[ME.handle]) { acc[ME.handle].pic = ME.pic; saveAccounts(acc); }
+  }
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────
+function go(screen) {
+  const prev = S.screen;
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  $('s-' + screen).classList.add('on');
+  const nb = $('nb-' + screen);
+  if (nb) nb.classList.add('on');
+  S.screen = screen;
+  if (screen === 'cam') startCam();
+  else if (prev === 'cam') stopCam();
+  if (screen === 'prof') refreshProf();
+  if (screen === 'stories') renderStories();
+}
+
+// ── CHAT LIST ────────────────────────────────────────────────
+function renderChats(filter) {
+  filter = (filter||'').toLowerCase();
+  const el = $('chat-list');
+  if (!el) return;
+  const vis = filter
+    ? CHATS.filter(c => c.name.toLowerCase().includes(filter) || c.handle.toLowerCase().includes(filter))
+    : CHATS;
+
+  if (vis.length === 0) {
+    $('chat-lbl').textContent = 'MESSAGES';
+    el.innerHTML = `<div class="empty">
+      <div class="ei">💬</div>
+      <div class="et">Aucune conversation</div>
+      <div class="es">Appuie sur ➕ pour ajouter un ami.<br>Ton ami doit avoir créé un compte Flash ⚡</div>
+    </div>`;
+    return;
+  }
+  $('chat-lbl').textContent = `MESSAGES — ${vis.length} ami${vis.length>1?'s':''}`;
+  el.innerHTML = vis.map(chat => {
+    const avHTML = makeAv(chat.handle, chat.name, chat.pic||null, 52);
+    const col = avatarColor(chat.handle);
+    const dot = `<div class="dot ${chat.status==='online'?'on':'aw'}" style="position:absolute;bottom:2px;right:2px;"></div>`;
+    const avWrap = `<div style="position:relative;flex-shrink:0;">${avHTML}${dot}</div>`;
+    return `<div class="ci" onclick="openConvo('${esc(chat.id)}')">
+      ${avWrap}
+      <div class="ci-info">
+        <div class="ci-name">${esc(chat.name)}</div>
+        <div class="ci-prev ${chat.unread?'u':''}">${esc(chat.preview||'')}</div>
       </div>
-    </div>
+      <div class="ci-meta">
+        <span class="ci-time">${chat.time||''}</span>
+        <div class="nbadge ${chat.unread?'r':'g'}">${chat.unread?'▶':'💬'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function filterChats(v) { renderChats(v); }
 
-         FULL PHOTO VIEWER
-    ══════════════════════════════ -->
-    <div id="full-photo-viewer">
-      <img id="full-photo-img" src="" alt="">
-      <button class="close-full" onclick="closeFullPhotoViewer()">✕</button>
-    </div>
+// ── CONVERSATION ─────────────────────────────────────────────
+function openConvo(chatId) {
+  const chat = CHATS.find(c => c.id === chatId);
+  if (!chat) return;
+  chat.unread = false;
+  S.convoId = chatId;
 
-    <!-- NAVBAR -->
-    <div class="navbar">
-      <button class="nav-btn active" id="nb-chat"     onclick="navigateTo('chat')">
-        <span class="nav-icon">💬</span>
-        <span class="nav-label">Chat</span>
-      </button>
-      <button class="nav-btn" id="nb-stories"  onclick="navigateTo('stories')">
-        <span class="nav-icon">📖</span>
-        <span class="nav-label">Stories</span>
-      </button>
-      <button class="nav-btn" id="nb-camera"   onclick="navigateTo('camera')">
-        <span class="nav-icon camera-center">📷</span>
-      </button>
-      <button class="nav-btn" id="nb-discover" onclick="navigateTo('discover')">
-        <span class="nav-icon">🔍</span>
-        <span class="nav-label">Discover</span>
-      </button>
-      <button class="nav-btn" id="nb-profile"  onclick="navigateTo('profile')">
-        <span class="nav-icon">👤</span>
-        <span class="nav-label">Profil</span>
-      </button>
-    </div>
+  const avHTML = makeAv(chat.handle, chat.name, chat.pic||null, 36);
+  $('convo-hdr').innerHTML = `${avHTML}
+    <div style="min-width:0;">
+      <div class="cname" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(chat.name)}</div>
+      <div class="cstat">${chat.status==='online'?'● En ligne':'● Absent'}</div>
+    </div>`;
 
-    <!-- TOAST -->
-    <div id="toast"></div>
+  renderMsgs(chatId);
+  go('convo');
+  setTimeout(() => { const i=$('minp'); if(i) i.focus(); }, 300);
+}
 
-  </div><!-- /app-wrapper -->
-</div><!-- /phone -->
+function renderMsgs(chatId) {
+  const el = $('msgs');
+  if (!el) return;
+  const chat = CHATS.find(c => c.id === chatId);
+  const list = MSGS[chatId] || [];
 
-<script src="script.js"></script>
+  let theirAv = chat ? makeAv(chat.handle, chat.name, chat.pic||null, 26) : '';
+
+  let html = '<div class="daylbl">Aujourd\'hui</div>';
+  list.forEach(m => {
+    if (m.photo) {
+      const safeUrl = m.photo.replace(/'/g,'%27');
+      html += `<div class="brow ${m.from}">
+        ${m.from==='them' ? `<div class="bav">${theirAv}</div>` : ''}
+        <img class="bphoto" src="${m.photo}" onclick="openFP('${safeUrl}')">
+      </div><div class="btm ${m.from==='me'?'me':''}">${m.time}</div>`;
+    } else {
+      html += `<div class="brow ${m.from}">
+        ${m.from==='them' ? `<div class="bav">${theirAv}</div>` : ''}
+        <div class="bub ${m.from}">${esc(m.text)}</div>
+      </div><div class="btm ${m.from==='me'?'me':''}">${m.time}</div>`;
+    }
+  });
+  el.innerHTML = html;
+  requestAnimationFrame(() => el.scrollTop = el.scrollHeight);
+}
+
+// ─── ENVOI DE MESSAGE ─────────────────────────────────────────
+function sendMsg() {
+  const inp = $('minp');
+  if (!inp) return;
+  const text = inp.value.trim();
+  if (!text || !S.convoId) return;
+
+  const cid = S.convoId;
+  const t   = now();
+  if (!MSGS[cid]) MSGS[cid] = [];
+  MSGS[cid].push({ from:'me', text, time:t });
+  inp.value = '';
+
+  const chat = CHATS.find(c => c.id === cid);
+  if (chat) { chat.preview = text; chat.time = 'Maintenant'; chat.unread = false; }
+
+  S.score += 5;
+  renderMsgs(cid);
+  renderChats();
+  saveState();
+  autoReply(cid, chat);
+}
+
+function autoReply(cid, chat) {
+  const delay = 900 + Math.floor(Math.random() * 1100);
+  setTimeout(() => showTyping(cid), delay - 350);
+  setTimeout(() => {
+    hideTyping();
+    const rep = REPLIES[Math.floor(Math.random() * REPLIES.length)];
+    if (!MSGS[cid]) return;
+    MSGS[cid].push({ from:'them', text:rep, time:now() });
+    if (chat) { chat.preview = rep; chat.time = 'Maintenant'; }
+    if (S.convoId === cid) renderMsgs(cid);
+    renderChats();
+    saveState();
+  }, delay);
+}
+
+function showTyping(cid) {
+  if (S.convoId !== cid) return;
+  const el = $('msgs');
+  if (!el) return;
+  const chat = CHATS.find(c => c.id === cid);
+  const avHTML = chat ? makeAv(chat.handle, chat.name, chat.pic||null, 26) : '';
+  const row = document.createElement('div');
+  row.id = 'typr';
+  row.className = 'typing-row';
+  row.innerHTML = `<div class="bav">${avHTML}</div>
+    <div class="tdots"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  el.appendChild(row);
+  el.scrollTop = el.scrollHeight;
+}
+function hideTyping() { const e=$('typr'); if(e) e.remove(); }
+
+function sendPhoto(inp) {
+  const file = inp.files[0];
+  if (!file || !S.convoId) return;
+  const r = new FileReader();
+  r.onload = e => {
+    const cid = S.convoId;
+    if (!MSGS[cid]) MSGS[cid] = [];
+    MSGS[cid].push({ from:'me', photo:e.target.result, time:now() });
+    const chat = CHATS.find(c => c.id === cid);
+    if (chat) { chat.preview = '📷 Photo'; chat.time = 'Maintenant'; }
+    S.snapCount++; S.score += 15;
+    pushSnap(e.target.result);
+    renderMsgs(cid); renderChats(); saveState();
+    toast('📷 Photo envoyée !');
+  };
+  r.readAsDataURL(file);
+  inp.value = '';
+}
+
+// ── CAMERA ───────────────────────────────────────────────────
+async function startCam() {
+  stopCam();
+  const v=$('cvid'), fb=$('cfb');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:S.facing, width:{ideal:1280}, height:{ideal:960} }, audio:false
+    });
+    S.camStream = stream;
+    v.srcObject = stream;
+    v.style.display = 'block';
+    fb.style.display = 'none';
+  } catch { v.style.display='none'; fb.style.display='flex'; }
+}
+function stopCam() {
+  if (S.camStream) { S.camStream.getTracks().forEach(t=>t.stop()); S.camStream=null; }
+  const v=$('cvid'); if(v){ v.srcObject=null; v.style.display='none'; }
+}
+function flipCam() {
+  S.facing = S.facing==='environment'?'user':'environment';
+  startCam();
+  toast(S.facing==='user'?'🤳 Frontale':'📷 Arrière');
+}
+function captureSnap() {
+  const v=$('cvid'), c=$('ccanv'), fl=$('fov');
+  fl.classList.add('flash'); setTimeout(()=>fl.classList.remove('flash'),150);
+  let data;
+  if (v.srcObject && v.readyState>=2) {
+    c.width=v.videoWidth||640; c.height=v.videoHeight||480;
+    const ctx=c.getContext('2d');
+    if (S.facing==='user'){ ctx.translate(c.width,0); ctx.scale(-1,1); }
+    ctx.drawImage(v,0,0,c.width,c.height);
+    data = c.toDataURL('image/jpeg',.88);
+  } else {
+    data = makeFakeSnap(c);
+  }
+  S.capturedPhoto=data; S.snapCount++; S.score+=10;
+  pushSnap(data); showPreview(data);
+}
+function makeFakeSnap(c) {
+  const pals=[['#1a1a2e','#0f3460'],['#0f0c29','#302b63'],['#134e5e','#71b280'],['#fc4a1a','#f7b733'],['#2d1b69','#11998e'],['#c94b4b','#4b134f']];
+  const emojis=['🌟','🔥','⚡','🎵','💫','🌈','❄️','🌙'];
+  c.width=640; c.height=480;
+  const ctx=c.getContext('2d');
+  const [c1,c2]=pals[S.snapCount%pals.length];
+  const g=ctx.createLinearGradient(0,0,640,480);
+  g.addColorStop(0,c1); g.addColorStop(1,c2);
+  ctx.fillStyle=g; ctx.fillRect(0,0,640,480);
+  ctx.font='140px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(emojis[S.snapCount%emojis.length],320,240);
+  return c.toDataURL('image/jpeg',.88);
+}
+function showPreview(data) {
+  const w=$('prev-wrap');
+  $('prev-img').src=data;
+  w.style.cssText='position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;';
+}
+function discardPhoto() {
+  $('prev-wrap').style.display='none';
+  S.capturedPhoto=null;
+  S.snapCount=Math.max(0,S.snapCount-1);
+  S.score=Math.max(0,S.score-10);
+  if(S.recentSnaps.length) S.recentSnaps.shift();
+}
+function setAsProfile() {
+  if(!S.capturedPhoto) return;
+  applyPic(S.capturedPhoto);
+  $('prev-wrap').style.display='none';
+  S.capturedPhoto=null;
+  toast('📸 Photo de profil mise à jour !');
+}
+function openSendModal() {
+  if(!S.capturedPhoto) return;
+  $('prev-wrap').style.display='none';
+  $('snap-prev').src=S.capturedPhoto;
+  $('send-list').innerHTML = CHATS.length
+    ? CHATS.map(c=>`<div class="sti" onclick="sendSnapTo('${esc(c.id)}')">
+        ${makeAv(c.handle,c.name,c.pic||null,40)}
+        <div style="font-weight:700;font-size:.87rem">${esc(c.name)}</div>
+        <span style="margin-left:auto;font-size:1.1rem">📤</span>
+      </div>`).join('')
+    : '<div style="color:var(--gr);font-size:.83rem;text-align:center;padding:12px">Ajoute des amis avec ➕ !</div>';
+  openM('m-send');
+}
+function sendSnapTo(chatId) {
+  const data=S.capturedPhoto; if(!data) return;
+  if(!MSGS[chatId]) MSGS[chatId]=[];
+  MSGS[chatId].push({from:'me',photo:data,time:now()});
+  const chat=CHATS.find(c=>c.id===chatId);
+  if(chat){chat.preview='📷 Snap';chat.time='Maintenant';}
+  closeM('m-send'); S.capturedPhoto=null;
+  renderChats(); saveState();
+  toast('Snap envoyé à '+(chat?chat.name.split(' ')[0]:'ton ami')+' ⚡');
+}
+function gallerySnap(inp) {
+  const file=inp.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=e=>{S.capturedPhoto=e.target.result;S.snapCount++;S.score+=10;pushSnap(e.target.result);showPreview(e.target.result);};
+  r.readAsDataURL(file); inp.value='';
+}
+
+// ── PROFIL ───────────────────────────────────────────────────
+function applyPic(data) { ME.pic=data; pushSnap(data); refreshProf(); saveState(); }
+function changePic(inp) {
+  const file=inp.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=e=>{ applyPic(e.target.result); toast('📸 Photo de profil mise à jour !'); };
+  r.readAsDataURL(file); inp.value='';
+}
+function refreshProf() {
+  if(!ME) return;
+  $('p-hdl-top').textContent = '@'+ME.handle;
+  $('p-name').textContent    = ME.name;
+  $('p-hdl').textContent     = '@'+ME.handle;
+  $('s-snaps').textContent   = S.snapCount;
+  $('s-friends').textContent = CHATS.length;
+  $('s-views').textContent   = (S.snapCount*14+CHATS.length*80);
+  $('s-score').textContent   = S.score.toLocaleString('fr');
+  $('s-rank').textContent    = S.score>5000?'Top 5% 🏆':S.score>1000?'Top 20% ⭐':'';
+  // Avatar
+  const wrap=$('pav'), initEl=$('p-init');
+  const old=wrap.querySelector('img'); if(old) old.remove();
+  if(ME.pic){
+    initEl.style.display='none';
+    const img=document.createElement('img');
+    img.src=ME.pic;
+    img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;';
+    wrap.appendChild(img);
+  } else {
+    initEl.style.display='';
+    initEl.textContent=initials(ME.name);
+  }
+  renderGrid();
+}
+function renderGrid() {
+  const el=$('pgrid'); if(!el) return;
+  const fb=['🌅','🎮','🎵','🏃','🍕','🌊','🎨','🌙','⚡'];
+  const bgs=['#1a1a2e','#0f0c29','#134e5e','#2d1b69','#1c1c1c','#0a0a0a','#2c3e50','#1a0a2e','#0f1a1c'];
+  let html='';
+  for(let i=0;i<9;i++){
+    if(S.recentSnaps[i]){
+      const s=S.recentSnaps[i].replace(/'/g,'%27');
+      html+=`<div class="pgc" onclick="openFP('${s}')"><img src="${S.recentSnaps[i]}" loading="lazy"></div>`;
+    } else {
+      html+=`<div class="pgc" style="background:${bgs[i]}">${fb[i]}</div>`;
+    }
+  }
+  el.innerHTML=html;
+}
+
+// ── EDIT PROFIL ───────────────────────────────────────────────
+function openEditModal() {
+  $('e-name').value=ME.name; $('e-hdl').value=ME.handle;
+  openM('m-edit'); setTimeout(()=>$('e-name').focus(),200);
+}
+function saveEdit() {
+  const n=$('e-name').value.trim(), h=$('e-hdl').value.trim().replace('@','');
+  if(!n||!h){ toast('⚠️ Remplis tous les champs !'); return; }
+  ME.name=n; ME.handle=h;
+  closeM('m-edit'); refreshProf(); saveState(); toast('Profil mis à jour ✅');
+}
+
+// ── AJOUTER UN AMI ────────────────────────────────────────────
+// Recherche dans les comptes réels créés sur ce navigateur
+function openAddModal() {
+  S.pendingAdd = null;
+  $('add-inp').value = '';
+  $('add-res').innerHTML = '<div style="color:var(--gr);font-size:.8rem;font-weight:600;text-align:center;padding:4px 0">💡 Ton ami doit avoir créé un compte sur Flash ⚡</div>';
+  openM('m-add');
+  setTimeout(()=>$('add-inp').focus(), 200);
+}
+
+function searchFriend(val) {
+  const q   = val.trim().replace(/^@/,'').toLowerCase();
+  const res = $('add-res');
+  S.pendingAdd = null;
+  if (!q) {
+    res.innerHTML='<div style="color:var(--gr);font-size:.8rem;font-weight:600;text-align:center;padding:4px 0">💡 Ton ami doit avoir créé un compte sur Flash ⚡</div>';
+    return;
+  }
+  const accounts = loadAccounts();
+  const found = accounts[q];
+  if (!found) {
+    res.innerHTML=`<div style="text-align:center;padding:14px 0">
+      <div style="font-size:1.8rem;margin-bottom:6px">😕</div>
+      <div style="font-weight:700;margin-bottom:3px">Compte introuvable</div>
+      <div style="color:var(--gr);font-size:.79rem">@${esc(q)} n'a pas encore créé de compte Flash.</div>
+    </div>`;
+    return;
+  }
+  if (found.handle === ME.handle) {
+    res.innerHTML=`<div style="color:var(--ora);font-size:.82rem;font-weight:700;text-align:center;padding:6px 0">C'est toi 😄</div>`;
+    return;
+  }
+  const already = CHATS.some(c => c.handle === q);
+  if (already) {
+    res.innerHTML=`<div class="fc">
+      ${makeAv(found.handle,found.name,found.pic||null,44)}
+      <div><div style="font-weight:700">${esc(found.name)}</div>
+      <div style="color:var(--gr);font-size:.78rem">@${esc(found.handle)}</div></div>
+      <div style="background:var(--d3);color:var(--gr);padding:5px 12px;border-radius:99px;font-size:.75rem;font-weight:700;margin-left:auto">Déjà ami ✓</div>
+    </div>`;
+    return;
+  }
+  S.pendingAdd = found;
+  const col = avatarColor(found.handle);
+  res.innerHTML=`<div class="fc" style="border:1.5px solid ${col}40">
+    ${makeAv(found.handle,found.name,found.pic||null,44)}
+    <div><div style="font-weight:800">${esc(found.name)}</div>
+    <div style="color:var(--gr);font-size:.78rem">@${esc(found.handle)} · ✅ Compte vérifié</div></div>
+    <div style="color:var(--y);font-size:1.1rem;margin-left:auto">✓</div>
+  </div>`;
+}
+
+function doAdd() {
+  if (!S.pendingAdd) { toast('Cherche un @pseudo d\'abord !'); return; }
+  const u   = S.pendingAdd;
+  const cid = 'c_' + u.handle + '_' + Date.now();
+  CHATS.unshift({
+    id:cid, handle:u.handle, name:u.name, pic:u.pic||null,
+    status:'online', preview:'Dites bonjour 👋', time:'Maintenant', unread:false,
+  });
+  MSGS[cid] = [{
+    from:'them',
+    text:`Hé ! Moi c'est ${u.name.split(' ')[0]} 👋 Content d'être connectés sur Flash !`,
+    time:now(),
+  }];
+  closeM('m-add');
+  renderChats(); refreshProf(); saveState();
+  toast(`${u.name} ajouté(e) 🎉`);
+  S.pendingAdd = null;
+  setTimeout(()=>openConvo(cid), 320);
+}
+
+// ── STORIES ──────────────────────────────────────────────────
+const STORY_EMOJIS = ['🌅','🎮','🏔️','🎵','🌿','🌮','🎨','🌊','⚡','🎪'];
+const STORY_TEXTS  = ['Moment parfait ✨','Gaming night 🎮','Randonnée épique !','Ce son est 🔥','Nature 📷','Trop bon 😍','Nouvelle créa 🎨','Belle journée 🌊','Flash forever ⚡','Soirée folle 🎪'];
+
+function renderStories() {
+  const el = $('stlist'); if(!el) return;
+  if (CHATS.length === 0) {
+    el.innerHTML=`<div class="empty"><div class="ei">📖</div>
+      <div class="et">Aucune story</div>
+      <div class="es">Ajoute des amis pour voir leurs stories !</div>
+    </div>`;
+    $('cstrip').innerHTML=''; return;
+  }
+  el.innerHTML = CHATS.slice(0,6).map((chat,i) => {
+    const em = STORY_EMOJIS[i%STORY_EMOJIS.length];
+    const ri = chat.pic
+      ? `<div class="slri"><img src="${chat.pic}"></div>`
+      : `<div class="slri" style="background:${avatarColor(chat.handle)}20;color:${avatarColor(chat.handle)}">${initials(chat.name)}</div>`;
+    return `<div class="sli" onclick="openStory('${esc(chat.id)}',${i})">
+      <div class="slring">${ri}</div>
+      <div><div class="sl-n">${esc(chat.name)}</div><div class="sl-t">Il y a ${(i+1)*10}min · ${i+1} snap${i>0?'s':''}</div></div>
+      <div style="width:42px;height:42px;border-radius:9px;background:var(--d3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${em}</div>
+    </div>`;
+  }).join('');
+  // cam strip
+  $('cstrip').innerHTML = CHATS.slice(0,5).map((chat,i) => {
+    const ri = chat.pic
+      ? `<div class="sri"><img src="${chat.pic}"></div>`
+      : `<div class="sri" style="background:${avatarColor(chat.handle)}20;color:${avatarColor(chat.handle)}">${initials(chat.name)}</div>`;
+    return `<div class="sthumb" onclick="openStory('${esc(chat.id)}',${i})">
+      <div class="sring">${ri}</div>
+      <span class="stn">${chat.name.split(' ')[0]}</span>
+    </div>`;
+  }).join('');
+}
+
+function openStory(chatId, idx) {
+  const chat = CHATS.find(c=>c.id===chatId);
+  if (!chat) return;
+  const slides = (idx%3)+1;
+  S.story = { chat, slides, idx };
+  S.slideIdx = 0;
+  $('sv-prog').innerHTML = Array.from({length:slides},(_,i)=>
+    `<div class="sv-seg"><div class="sv-fill" id="sf-${i}"></div></div>`
+  ).join('');
+  const hav = chat.pic
+    ? `<div class="sv-hav"><img src="${chat.pic}"></div>`
+    : `<div class="sv-hav" style="background:${avatarColor(chat.handle)}20;color:${avatarColor(chat.handle)}">${initials(chat.name)}</div>`;
+  $('sv-hdr').innerHTML = `${hav}
+    <span class="sv-hn">${esc(chat.name)}</span>
+    <span class="sv-ht">Il y a ${(idx+1)*10}min</span>
+    <button class="sv-close" onclick="closeStory()">✕</button>`;
+  showSlide(0);
+  $('sv').classList.add('on');
+}
+function showSlide(idx) {
+  S.slideIdx=idx;
+  if(S.storyTimer) clearTimeout(S.storyTimer);
+  const {slides,idx:si}=S.story;
+  for(let i=0;i<slides;i++){
+    const f=$(`sf-${i}`);
+    if(f){f.style.transition='none';f.style.width=i<idx?'100%':'0%';}
+  }
+  const cur=$(`sf-${idx}`);
+  if(cur) requestAnimationFrame(()=>{cur.style.transition='width 4s linear';cur.style.width='100%';});
+  const bg  = STORY_BKGS[(idx+si)%STORY_BKGS.length];
+  const em  = STORY_EMOJIS[(idx+si)%STORY_EMOJIS.length];
+  const txt = STORY_TEXTS[(idx+si)%STORY_TEXTS.length];
+  $('sv-cnt').innerHTML=`<div class="sv-bg" style="background:${bg}"></div>
+    <div class="sv-txt"><div class="sv-e">${em}</div><div class="sv-t">${txt}</div></div>`;
+  S.storyTimer=setTimeout(nextSlide,4000);
+}
+function nextSlide() {
+  if(!S.story) return;
+  const next=S.slideIdx+1;
+  if(next<S.story.slides) showSlide(next); else closeStory();
+}
+function closeStory() {
+  if(S.storyTimer) clearTimeout(S.storyTimer);
+  $('sv').classList.remove('on');
+  S.story=null;
+}
+
+// ── DISCOVER ─────────────────────────────────────────────────
+function renderDiscover() {
+  const cats=['🔥 Trending','🎵 Musique','🏀 Sport','😂 Humour','🌍 Voyage','🍕 Food'];
+  $('cats').innerHTML=cats.map((c,i)=>
+    `<button class="cpill ${i===0?'on':''}" onclick="pickCat(this)">${c}</button>`
+  ).join('');
+  $('sgrid').innerHTML=SPOTS.map(s=>
+    `<div class="si" onclick="toast('▶ ${esc(s.cap)}')">
+      <div class="si-bg" style="background:${s.bg}">${s.emoji}</div>
+      <div class="si-ov"></div>
+      <div class="si-info">
+        <div class="si-auth">${s.auth}</div>
+        <div class="si-cap">${s.cap}</div>
+        <div class="si-stats"><span class="si-stat">👁 ${s.v}</span><span class="si-stat">❤️ ${s.l}</span></div>
+      </div>
+    </div>`
+  ).join('');
+}
+function pickCat(el) {
+  document.querySelectorAll('.cpill').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on'); toast(el.textContent);
+}
+
+// ── FULL PHOTO ────────────────────────────────────────────────
+function openFP(src) { $('fp-img').src=src; $('fp').classList.add('on'); }
+function closeFP()   { $('fp').classList.remove('on'); }
+
+// ── CLAVIER ──────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key==='Enter') {
+    const mi=$('minp');
+    if (mi && document.activeElement===mi) { e.preventDefault(); sendMsg(); return; }
+    const ai=$('add-inp');
+    if (ai && document.activeElement===ai) { e.preventDefault(); doAdd(); }
+  }
+  if (e.key==='Escape') { closeFP(); closeStory(); }
+});
+
+// ── BOUTON SEND ──────────────────────────────────────────────
+document.getElementById('sbtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  sendMsg();
+});
+
+// ── INIT ─────────────────────────────────────────────────────
+function initApp() {
+  renderChats();
+  renderStories();
+  renderDiscover();
+  refreshProf();
+}
+</script>
 </body>
 </html>
