@@ -644,25 +644,78 @@ html,body{height:100%;overflow:hidden;background:#000000;font-family:-apple-syst
 <script>
 'use strict';
 /* ══════════════════════════════════════════════════════════════
-   FLASH ⚡  —  Réseau social avec comptes locaux
-   Les comptes sont stockés dans localStorage du navigateur.
-   Chaque utilisateur peut créer un compte et retrouver ses
-   données sur le même appareil / navigateur.
+   FLASH ⚡ — Base de données partagée (Firebase REST)
+   Les comptes sont visibles depuis tous les appareils.
 ══════════════════════════════════════════════════════════════ */
 
-// ── STORAGE ──────────────────────────────────────────────────
-// Tous les comptes enregistrés : { handle -> { name, handle, pw, pic, score, snaps } }
-function loadAccounts() {
-  try { return JSON.parse(localStorage.getItem('flash_accounts') || '{}'); } catch { return {}; }
+// ── FIREBASE REST ─────────────────────────────────────────────
+// ════════════════════════════════════════════════════════
+//  SETUP (1 fois) :
+//  1. Va sur https://console.firebase.google.com
+//  2. "Créer un projet" → donne-lui un nom
+//  3. Menu gauche → "Realtime Database" → "Créer une base"
+//     → choisir une région → "Mode test" → Activer
+//  4. Copie l'URL affichée (ex: https://mon-app-default-rtdb.firebaseio.com)
+//  5. Remplace la ligne DB = '...' ci-dessous par ton URL
+//  6. Remet le fichier sur GitHub → ça marche pour tout le monde !
+// ════════════════════════════════════════════════════════
+const DB = 'https://flash-reseau-default-rtdb.europe-west1.firebasedatabase.io';
+
+async function dbGet(path) {
+  try {
+    const r = await fetch(`${DB}/${path}.json`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d;
+  } catch {
+    showFirebaseError();
+    return null;
+  }
 }
-function saveAccounts(data) {
-  try { localStorage.setItem('flash_accounts', JSON.stringify(data)); } catch {}
+
+async function dbSet(path, data) {
+  try {
+    const r = await fetch(`${DB}/${path}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!r.ok) showFirebaseError();
+  } catch { showFirebaseError(); }
 }
-function loadMyData(handle) {
-  try { return JSON.parse(localStorage.getItem('flash_me_' + handle) || 'null'); } catch { return null; }
+
+function showFirebaseError() {
+  const existing = document.getElementById('fb-err');
+  if (existing) return;
+  const el = document.createElement('div');
+  el.id = 'fb-err';
+  el.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#FF3B3B;color:#fff;padding:12px 16px;font-size:.82rem;font-weight:700;z-index:9999;text-align:center;';
+  el.innerHTML = '⚠️ Base de données non configurée — <a href="https://console.firebase.google.com" target="_blank" style="color:#fff;text-decoration:underline">Créer Firebase</a> et modifier la ligne DB= dans le code';
+  document.body.appendChild(el);
 }
-function saveMyData(handle, data) {
-  try { localStorage.setItem('flash_me_' + handle, JSON.stringify(data)); } catch {}
+
+// Hash simple du mot de passe
+function hashPw(pw) {
+  let h = 5381;
+  for (let i = 0; i < pw.length; i++) h = ((h << 5) + h) ^ pw.charCodeAt(i);
+  return (h >>> 0).toString(36);
+}
+
+// ── STORAGE ───────────────────────────────────────────────────
+async function getAccount(hdl) {
+  return await dbGet('accounts/' + hdl);
+}
+async function setAccount(hdl, data) {
+  await dbSet('accounts/' + hdl, data);
+}
+
+// Données perso (chats, msgs, snaps) → localStorage
+// (les photos base64 sont trop lourdes pour Firebase gratuit)
+function loadLocal(handle) {
+  try { return JSON.parse(localStorage.getItem('fl_' + handle) || 'null'); } catch { return null; }
+}
+function saveLocal(handle, data) {
+  try { localStorage.setItem('fl_' + handle, JSON.stringify(data)); } catch {}
 }
 
 // ── ÉTAT ─────────────────────────────────────────────────────
@@ -759,56 +812,60 @@ function switchTab(t) {
   hideErr();
 }
 
-function doAuth() {
+async function doAuth() {
   hideErr();
-  const accounts = loadAccounts();
+  const btn = $('auth-btn');
+  btn.textContent = '⏳ Connexion...';
+  btn.disabled = true;
 
-  if (authTab === 'up') {
-    // ── INSCRIPTION ──
-    const name = $('up-name').value.trim();
-    const hdl  = $('up-hdl').value.trim().replace(/^@/, '').toLowerCase();
-    const pw   = $('up-pw').value;
-    const pw2  = $('up-pw2').value;
-    if (!name)        { showErr('Entre ton nom !'); return; }
-    if (!hdl)         { showErr('Entre un @pseudo !'); return; }
-    if (!/^[a-z0-9_]{2,20}$/.test(hdl)) { showErr('Pseudo : lettres, chiffres, _ (2-20 caractères)'); return; }
-    if (!pw)          { showErr('Entre un mot de passe !'); return; }
-    if (pw.length < 4){ showErr('Mot de passe trop court (min 4 car.)'); return; }
-    if (pw !== pw2)   { showErr('Les mots de passe ne correspondent pas !'); return; }
-    if (accounts[hdl]){ showErr('@' + hdl + ' est déjà pris !'); return; }
-    // Créer le compte
-    accounts[hdl] = { name, handle:hdl, pw, pic:null };
-    saveAccounts(accounts);
-    login({ name, handle:hdl, pic:null });
+  try {
+    if (authTab === 'up') {
+      const name = $('up-name').value.trim();
+      const hdl  = $('up-hdl').value.trim().replace(/^@/,'').toLowerCase();
+      const pw   = $('up-pw').value;
+      const pw2  = $('up-pw2').value;
+      if (!name)        { showErr('Entre ton nom !'); return; }
+      if (!hdl)         { showErr('Entre un @pseudo !'); return; }
+      if (!/^[a-z0-9_]{2,20}$/.test(hdl)) { showErr('Pseudo : lettres minuscules, chiffres, _ (2-20 car.)'); return; }
+      if (!pw)          { showErr('Entre un mot de passe !'); return; }
+      if (pw.length < 4){ showErr('Mot de passe trop court (min 4 car.)'); return; }
+      if (pw !== pw2)   { showErr('Les mots de passe ne correspondent pas !'); return; }
+      const existing = await getAccount(hdl);
+      if (existing)     { showErr('@' + hdl + ' est déjà pris !'); return; }
+      await setAccount(hdl, { name, handle:hdl, pwh: hashPw(pw), pic:null });
+      doLogin({ name, handle:hdl, pic:null });
 
-  } else {
-    // ── CONNEXION ──
-    const hdl = $('in-hdl').value.trim().replace(/^@/, '').toLowerCase();
-    const pw  = $('in-pw').value;
-    if (!hdl) { showErr('Entre ton @pseudo !'); return; }
-    if (!pw)  { showErr('Entre ton mot de passe !'); return; }
-    const acc = accounts[hdl];
-    if (!acc)       { showErr('Compte @' + hdl + ' introuvable'); return; }
-    if (acc.pw !== pw) { showErr('Mot de passe incorrect'); return; }
-    login({ name:acc.name, handle:hdl, pic:acc.pic || null });
+    } else {
+      const hdl = $('in-hdl').value.trim().replace(/^@/,'').toLowerCase();
+      const pw  = $('in-pw').value;
+      if (!hdl) { showErr('Entre ton @pseudo !'); return; }
+      if (!pw)  { showErr('Entre ton mot de passe !'); return; }
+      const acc = await getAccount(hdl);
+      if (!acc)                     { showErr('Compte @' + hdl + ' introuvable'); return; }
+      // Compatibilité anciens comptes (pw en clair) et nouveaux (pwh hashé)
+      const ok = acc.pwh ? acc.pwh === hashPw(pw) : acc.pw === pw;
+      if (!ok) { showErr('Mot de passe incorrect'); return; }
+      doLogin({ name:acc.name, handle:hdl, pic:acc.pic||null });
+    }
+  } finally {
+    btn.textContent = authTab==='in' ? 'Se connecter' : 'Créer mon compte';
+    btn.disabled = false;
   }
 }
 
 function doDemo() {
-  // Compte démo sans inscription
-  login({ name:'Utilisateur Démo', handle:'demo_' + Date.now().toString(36), pic:null, demo:true });
+  doLogin({ name:'Démo', handle:'demo_' + Date.now().toString(36), pic:null, demo:true });
 }
 
-function login(user) {
+function doLogin(user) {
   ME = user;
-  // Charger les données persistantes (chats, snaps, score)
-  const saved = loadMyData(ME.handle);
+  const saved = loadLocal(ME.handle);
   if (saved) {
-    CHATS        = saved.chats    || [];
-    MSGS         = saved.msgs     || {};
-    S.recentSnaps = saved.snaps   || [];
+    CHATS         = saved.chats    || [];
+    MSGS          = saved.msgs     || {};
+    S.recentSnaps = saved.snaps    || [];
     S.snapCount   = saved.snapCount || 0;
-    S.score       = saved.score     || 0;
+    S.score       = saved.score    || 0;
     if (saved.pic) ME.pic = saved.pic;
   } else {
     CHATS = []; MSGS = {}; S.recentSnaps = []; S.snapCount = 0; S.score = 0;
@@ -820,16 +877,14 @@ function login(user) {
 }
 
 function saveState() {
-  if (!ME || ME.demo) return;
-  saveMyData(ME.handle, {
-    chats: CHATS, msgs: MSGS,
-    snaps: S.recentSnaps, snapCount: S.snapCount, score: S.score,
-    pic: ME.pic || null,
+  if (!ME) return;
+  saveLocal(ME.handle, {
+    chats: CHATS, msgs: MSGS, snaps: S.recentSnaps,
+    snapCount: S.snapCount, score: S.score, pic: ME.pic || null,
   });
-  // Mettre à jour la photo dans les comptes
-  if (ME.pic) {
-    const acc = loadAccounts();
-    if (acc[ME.handle]) { acc[ME.handle].pic = ME.pic; saveAccounts(acc); }
+  // Sync photo profil dans Firebase (sans photo base64 pour la taille)
+  if (ME.pic && !ME.demo) {
+    setAccount(ME.handle, { name:ME.name, handle:ME.handle, pwh:'', pic:ME.pic });
   }
 }
 
@@ -1178,16 +1233,16 @@ function openAddModal() {
   setTimeout(()=>$('add-inp').focus(), 200);
 }
 
-function searchFriend(val) {
+async function searchFriend(val) {
   const q   = val.trim().replace(/^@/,'').toLowerCase();
   const res = $('add-res');
   S.pendingAdd = null;
   if (!q) {
-    res.innerHTML='<div style="color:#888888;font-size:.8rem;font-weight:600;text-align:center;padding:4px 0">💡 Ton ami doit avoir créé un compte sur Flash ⚡</div>';
+    res.innerHTML='<div style="color:#888888;font-size:.8rem;font-weight:600;text-align:center;padding:4px 0">💡 Entre le @pseudo de ton ami</div>';
     return;
   }
-  const accounts = loadAccounts();
-  const found = accounts[q];
+  res.innerHTML='<div style="color:#888888;font-size:.8rem;text-align:center;padding:8px 0">🔍 Recherche en cours...</div>';
+  const found = await getAccount(q);
   if (!found) {
     res.innerHTML=`<div style="text-align:center;padding:14px 0">
       <div style="font-size:1.8rem;margin-bottom:6px">😕</div>
