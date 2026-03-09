@@ -51,16 +51,46 @@ button,input{font-family:inherit;border:none;outline:none;-webkit-appearance:non
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 30px;gap:8px;text-align:center;flex:1;}
 .empty .ei{font-size:2.8rem;}.empty .et{font-weight:800;font-size:1rem;}.empty .es{font-size:.8rem;color:#555;line-height:1.6;}
 
-/* CHAT LIST */
-#s-chat{background:#000;}
+/* ═══════════════════════════════════
+   CHAT LIST — split layout
+═══════════════════════════════════ */
+#s-chat{background:#000;flex-direction:row!important;}
+
+/* Panneau gauche (liste) */
+#panel-left{
+  width:100%;
+  max-width:360px;
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid #111;
+  flex-shrink:0;
+  overflow:hidden;
+}
+/* Panneau droit (conversation) */
+#panel-right{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  overflow:hidden;
+  min-width:0;
+}
+/* Sur mobile, on cache le panneau droit par défaut */
+@media(max-width:700px){
+  #panel-left{max-width:100%;border-right:none;}
+  #panel-right{display:none;position:absolute;inset:0;background:#000;z-index:5;}
+  #panel-right.open{display:flex;}
+  #panel-left.hidden{display:none;}
+}
+
 .chat-search{margin:0 14px 12px;display:flex;align-items:center;gap:8px;background:#111;border-radius:13px;padding:10px 14px;flex-shrink:0;}
 .chat-search span{color:#444;}
 .chat-search input{background:transparent;color:#fff;font-size:.86rem;font-weight:600;flex:1;}
 .chat-search input::placeholder{color:#333;}
 .clist{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:86px;}
 .clist::-webkit-scrollbar{display:none;}
-.ci{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;}
-.ci:active{background:#0d0d0d;}
+.ci{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;transition:background .1s;}
+.ci:active,.ci.active{background:#0d0d0d;}
 .av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;flex-shrink:0;position:relative;overflow:hidden;}
 .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .av-dot{position:absolute;bottom:2px;right:2px;width:12px;height:12px;border-radius:50%;border:2.5px solid #000;z-index:2;}
@@ -74,44 +104,50 @@ button,input{font-family:inherit;border:none;outline:none;-webkit-appearance:non
 .nbadge{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.67rem;}
 .nbadge.r{background:#FF3B3B;}.nbadge.g{background:#1a1a1a;color:#444;}
 
-/* ═══════════════════════════════════════════
-   CONVERSATION — structure critique iPad
-   On utilise position:absolute pour TOUT
-   pour ne pas dépendre du flexbox Safari
-═══════════════════════════════════════════ */
-#s-convo{background:#000;}
-
-/* header fixé en haut */
+/* ═══════════════════════════════════
+   CONVERSATION (dans panel-right)
+═══════════════════════════════════ */
 #convo-header{
-  position:absolute;
-  top:0;left:0;right:0;
-  z-index:10;
+  flex-shrink:0;
   background:#000;
   border-bottom:1px solid #111;
-  padding:50px 14px 10px;
+  padding:12px 14px;
   display:flex;
   align-items:center;
   gap:9px;
 }
+/* padding-top extra sur mobile pour la safe area */
+@media(max-width:700px){
+  #convo-header{padding-top:52px;}
+}
 .bkbtn{width:36px;height:36px;border-radius:50%;background:#111;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .bkbtn:active{background:#1a1a1a;}
+/* Sur desktop, cacher le bouton retour */
+@media(min-width:701px){.bkbtn{display:none;}}
 .cav-sm{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.76rem;flex-shrink:0;overflow:hidden;}
 .cav-sm img{width:100%;height:100%;object-fit:cover;}
 .cname{font-weight:800;font-size:.9rem;}
 .cstatus{font-size:.72rem;color:#00D26A;font-weight:600;}
 
-/* zone de messages — entre header et input bar */
+/* Placeholder quand aucune conv sélectionnée */
+#no-convo{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  padding:30px;text-align:center;
+}
+#no-convo .ni{font-size:3rem;}
+#no-convo .nt{font-weight:800;font-size:1rem;}
+#no-convo .ns{font-size:.82rem;color:#333;}
+
+/* Zone messages */
 #msgs-area{
-  position:absolute;
-  top:110px;
-  left:0;right:0;
-  bottom:72px;
+  flex:1;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   padding:12px 14px;
   display:flex;
   flex-direction:column;
   gap:3px;
+  min-height:0;
 }
 #msgs-area::-webkit-scrollbar{display:none;}
 .daylbl{text-align:center;font-size:.64rem;color:#333;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:6px 0;}
@@ -131,57 +167,155 @@ button,input{font-family:inherit;border:none;outline:none;-webkit-appearance:non
 .td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
 @keyframes tda{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
 
-/* BARRE DE SAISIE — fixée en bas absolu */
+/* ═══════════════════════════════════
+   BARRE DE SAISIE — style WhatsApp
+═══════════════════════════════════ */
 #input-bar{
-  position:absolute;
-  bottom:0;left:0;right:0;
-  height:72px;
-  background:#111;
-  border-top:2px solid #222;
-  z-index:10;
-  /* PAS de flexbox — on utilise table pour iPad */
+  flex-shrink:0;
+  padding:10px 10px 18px;
+  background:#000;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  position:relative;
 }
-#input-bar table{
-  width:100%;
-  height:72px;
-  border-collapse:collapse;
-  padding:0 10px;
+/* safe area iOS */
+@supports(padding-bottom:env(safe-area-inset-bottom)){
+  #input-bar{padding-bottom:calc(10px + env(safe-area-inset-bottom));}
 }
-#input-bar td{padding:0;}
-#input-bar .td-icon{width:48px;text-align:center;}
-#input-bar .td-btn{width:54px;text-align:center;}
-#input-bar .td-input{padding:0 6px;}
-#photo-btn{
-  width:40px;height:40px;border-radius:50%;
-  background:#1a1a1a;color:#fff;font-size:1.1rem;
-  cursor:pointer;border:none;
+.inp-main{
+  flex:1;
+  display:flex;
+  align-items:center;
+  background:#1a1a1a;
+  border-radius:26px;
+  padding:0 10px 0 14px;
+  gap:8px;
+  min-height:50px;
+}
+#emoji-btn{
+  background:transparent;border:none;
+  font-size:1.3rem;cursor:pointer;
+  color:#aaa;flex-shrink:0;
+  padding:4px;
 }
 #minp{
-  width:100%;
-  background:#1a1a1a;
-  border-radius:22px;
-  padding:12px 16px;
+  flex:1;
+  background:transparent;
   color:#fff;
   font-size:16px;
-  font-weight:600;
+  font-weight:500;
   border:none;
   outline:none;
-  display:block;
+  padding:10px 0;
+  min-width:0;
 }
-#minp::placeholder{color:#444;}
-#sbtn{
-  width:46px;height:46px;
+#minp::placeholder{color:#555;}
+.inp-icons{display:flex;align-items:center;gap:2px;flex-shrink:0;}
+#attach-btn,#cam-inp-btn{
+  background:transparent;border:none;
+  font-size:1.15rem;cursor:pointer;
+  color:#888;padding:6px;
+}
+#attach-btn:active,#cam-inp-btn:active{color:#fff;}
+/* Bouton micro — gros cercle vert */
+#mic-btn{
+  width:52px;height:52px;
   border-radius:50%;
-  background:#FFFC00;
-  color:#000;
-  font-size:1.3rem;
-  font-weight:900;
+  background:#00A884;
+  color:#fff;
+  font-size:1.4rem;
   cursor:pointer;
   border:none;
-  display:block;
-  margin:0 auto;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 2px 14px rgba(0,168,132,.45);
+  transition:background .15s,transform .12s;
 }
-#sbtn:active{background:#d4d000;}
+#mic-btn:active{background:#008f70;transform:scale(.92);}
+#mic-btn.recording{background:#FF3B3B;box-shadow:0 2px 20px rgba(255,59,59,.55);animation:pulse-rec .8s infinite;}
+@keyframes pulse-rec{0%,100%{box-shadow:0 2px 20px rgba(255,59,59,.5);}50%{box-shadow:0 2px 34px rgba(255,59,59,.9);}}
+/* Bouton envoyer (apparaît quand texte) */
+#sbtn{
+  width:52px;height:52px;
+  border-radius:50%;
+  background:#00A884;
+  color:#fff;
+  font-size:1.3rem;
+  cursor:pointer;
+  border:none;
+  display:none;
+  align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 2px 14px rgba(0,168,132,.45);
+  transition:background .15s,transform .12s;
+}
+#sbtn:active{background:#008f70;transform:scale(.92);}
+
+/* ═══════════════════════════════════
+   BARRE D'ENREGISTREMENT VOCAL
+═══════════════════════════════════ */
+#rec-bar{
+  flex-shrink:0;
+  padding:10px 14px 18px;
+  background:#000;
+  display:none;
+  align-items:center;
+  gap:12px;
+}
+@supports(padding-bottom:env(safe-area-inset-bottom)){
+  #rec-bar{padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+}
+#rec-bar.on{display:flex;}
+.rec-dot{width:10px;height:10px;border-radius:50%;background:#FF3B3B;flex-shrink:0;animation:pulse-rec .8s infinite;}
+#rec-time{font-size:.9rem;font-weight:700;color:#fff;min-width:48px;}
+.rec-waves{flex:1;display:flex;align-items:center;justify-content:center;gap:3px;height:36px;overflow:hidden;}
+.rw{width:3px;border-radius:3px;background:#00A884;}
+@keyframes wave-anim{0%,100%{height:4px;opacity:.5;}50%{height:26px;opacity:1;}}
+#rec-cancel{
+  background:#1a1a1a;border:none;color:#aaa;
+  border-radius:50%;width:42px;height:42px;
+  font-size:.9rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+#rec-cancel:active{background:#222;}
+#rec-send{
+  width:52px;height:52px;border-radius:50%;
+  background:#00A884;color:#fff;font-size:1.3rem;
+  cursor:pointer;border:none;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 2px 14px rgba(0,168,132,.45);
+}
+
+/* ═══════════════════════════════════
+   BULLE VOCALE
+═══════════════════════════════════ */
+.voice-bub{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;
+  border-radius:18px;
+  max-width:270px;min-width:190px;
+}
+.voice-bub.me{background:#FFFC00;border-bottom-right-radius:4px;}
+.voice-bub.them{background:#1a1a1a;border-bottom-left-radius:4px;}
+.vplay{
+  width:36px;height:36px;border-radius:50%;
+  border:none;font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.voice-bub.me .vplay{background:rgba(0,0,0,.15);color:#000;}
+.voice-bub.them .vplay{background:rgba(255,255,255,.1);color:#fff;}
+.vinfo{flex:1;display:flex;flex-direction:column;gap:5px;}
+.vwave{height:20px;display:flex;align-items:center;gap:2px;cursor:pointer;}
+.vbar{width:3px;border-radius:2px;transition:background .1s;}
+.voice-bub.me .vbar{background:rgba(0,0,0,.3);}
+.voice-bub.them .vbar{background:rgba(255,255,255,.2);}
+.vbar.played{background:#00A884!important;}
+.vdur{font-size:.68rem;font-weight:700;}
+.voice-bub.me .vdur{color:rgba(0,0,0,.5);}
+.voice-bub.them .vdur{color:#555;}
 
 /* CAMERA */
 #s-cam{background:#000;overflow:hidden;}
@@ -201,7 +335,7 @@ button,input{font-family:inherit;border:none;outline:none;-webkit-appearance:non
 .stn{font-size:.6rem;color:rgba(255,255,255,.5);font-weight:700;max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;}
 .cbot{position:absolute;bottom:0;left:0;right:0;z-index:20;padding:16px 0 32px;display:flex;align-items:center;justify-content:center;gap:36px;}
 .csb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.35);font-size:1.25rem;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;border:none;}
-.shutter{width:76px;height:76px;border-radius:50%;border:5px solid rgba(255,255,255,.88);background:transparent;cursor:pointer;position:relative;transition:transform .1s;border:5px solid rgba(255,255,255,.88);}
+.shutter{width:76px;height:76px;border-radius:50%;border:5px solid rgba(255,255,255,.88);background:transparent;cursor:pointer;position:relative;transition:transform .1s;}
 .shutter::after{content:'';position:absolute;inset:7px;border-radius:50%;background:rgba(255,255,255,.88);transition:all .1s;}
 .shutter:active{transform:scale(.9);}.shutter:active::after{background:#FFFC00;}
 .fov{position:absolute;inset:0;z-index:50;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s;}
@@ -350,46 +484,69 @@ button,input{font-family:inherit;border:none;outline:none;-webkit-appearance:non
 
 <div id="app" style="display:none;position:absolute;inset:0;">
 
-<!-- CHAT LIST -->
+<!-- CHAT : split layout -->
 <div class="scr on" id="s-chat">
-  <div class="topbar">
-    <span class="topbar-logo">Flash ⚡</span>
-    <button class="ib" onclick="refreshUsers()">🔄</button>
-  </div>
-  <div class="chat-search">
-    <span>🔍</span>
-    <input placeholder="Chercher..." oninput="filterChats(this.value)">
-  </div>
-  <div class="section-lbl" id="chat-lbl">MESSAGES</div>
-  <div class="clist" id="chat-list"></div>
-</div>
 
-<!-- CONVERSATION -->
-<div class="scr" id="s-convo">
-  <!-- Header -->
-  <div id="convo-header">
-    <button class="bkbtn" onclick="go('chat')">‹</button>
-    <div id="convo-hdr" style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;"></div>
+  <!-- Panneau gauche -->
+  <div id="panel-left">
+    <div class="topbar">
+      <span class="topbar-logo">Flash ⚡</span>
+      <button class="ib" onclick="refreshUsers()">🔄</button>
+    </div>
+    <div class="chat-search">
+      <span>🔍</span>
+      <input placeholder="Chercher..." oninput="filterChats(this.value)">
+    </div>
+    <div class="section-lbl" id="chat-lbl">MESSAGES</div>
+    <div class="clist" id="chat-list"></div>
   </div>
-  <!-- Messages -->
-  <div id="msgs-area"></div>
-  <!-- Barre de saisie — TOUJOURS visible en bas -->
-  <div id="input-bar">
-    <table width="100%" style="height:72px;border-collapse:collapse;padding:0 8px;">
-      <tr>
-        <td class="td-icon">
-          <button id="photo-btn" onclick="document.getElementById('photo-inp').click()">📎</button>
-          <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="sendPhoto(this)">
-        </td>
-        <td class="td-input">
-          <input id="minp" type="text" placeholder="Écris un message..." autocorrect="off" autocomplete="off" autocapitalize="sentences">
-        </td>
-        <td class="td-btn">
-          <button id="sbtn">▶</button>
-        </td>
-      </tr>
-    </table>
+
+  <!-- Panneau droit -->
+  <div id="panel-right">
+    <!-- Placeholder aucune conv -->
+    <div id="no-convo">
+      <div class="ni">💬</div>
+      <div class="nt">Tes messages</div>
+      <div class="ns">Sélectionne un contact pour commencer à discuter.</div>
+    </div>
+
+    <!-- Conversation (cachée tant que pas de convo) -->
+    <div id="convo-wrap" style="display:none;flex-direction:column;height:100%;">
+      <div id="convo-header">
+        <button class="bkbtn" onclick="closeConvo()">‹</button>
+        <div id="convo-hdr" style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;"></div>
+      </div>
+
+      <div id="msgs-area"></div>
+
+      <!-- Barre de saisie WhatsApp -->
+      <div id="input-bar">
+        <div class="inp-main">
+          <button id="emoji-btn">😊</button>
+          <input id="minp" type="text" placeholder="Message..." autocorrect="off" autocomplete="off" autocapitalize="sentences">
+          <div class="inp-icons">
+            <button id="attach-btn" onclick="document.getElementById('photo-inp').click()">📎</button>
+            <button id="cam-inp-btn" onclick="go('cam')">📷</button>
+          </div>
+        </div>
+        <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="sendPhoto(this)">
+        <!-- Micro (visible quand champ vide) -->
+        <button id="mic-btn">🎤</button>
+        <!-- Envoyer (visible quand texte) -->
+        <button id="sbtn">▶</button>
+      </div>
+
+      <!-- Barre d'enregistrement vocal -->
+      <div id="rec-bar">
+        <div class="rec-dot"></div>
+        <span id="rec-time">0:00</span>
+        <div class="rec-waves" id="rec-waves"></div>
+        <button id="rec-cancel" onclick="cancelRec()">✕</button>
+        <button id="rec-send" onclick="sendVoice()">▶</button>
+      </div>
+    </div>
   </div>
+
 </div>
 
 <!-- CAMERA -->
@@ -608,6 +765,41 @@ function go(screen){
   if(screen==='disc')renderDiscover();
 }
 
+/* ═════ SPLIT LAYOUT ═════ */
+function openConvo(handle){
+  const u=USERS[handle];if(!u)return;
+  S.convoId=handle;
+  if(MSGS[handle])MSGS[handle].forEach(m=>{if(m.from==='them')m.read=true;});
+  const avHTML=makeAv(u.handle,u.name,u.pic||null,36);
+  $('convo-hdr').innerHTML=`${avHTML}<div style="min-width:0;"><div class="cname" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(u.name)}</div><div class="cstatus">● En ligne</div></div>`;
+
+  // Highlight contact actif
+  document.querySelectorAll('.ci').forEach(el=>el.classList.remove('active'));
+  const ci=document.querySelector(`.ci[data-handle="${handle}"]`);if(ci)ci.classList.add('active');
+
+  // Afficher la conversation
+  $('no-convo').style.display='none';
+  $('convo-wrap').style.display='flex';
+
+  // Sur mobile → montrer panel droit, cacher gauche
+  if(window.innerWidth<=700){
+    $('panel-right').classList.add('open');
+    $('panel-left').classList.add('hidden');
+  }
+
+  renderMsgs(handle);
+  setTimeout(()=>{try{$('minp').focus();}catch(e){}},400);
+}
+
+function closeConvo(){
+  // Sur mobile → revenir à la liste
+  $('panel-right').classList.remove('open');
+  $('panel-left').classList.remove('hidden');
+  $('no-convo').style.display='flex';
+  $('convo-wrap').style.display='none';
+  S.convoId=null;
+}
+
 function renderChats(filter){
   filter=(filter||'').toLowerCase();
   const el=$('chat-list');if(!el)return;
@@ -617,54 +809,209 @@ function renderChats(filter){
   $('chat-lbl').textContent=`AMIS — ${users.length} personne${users.length>1?'s':''}`;
   el.innerHTML=users.map(u=>{
     const msgs=MSGS[u.handle]||[],last=msgs[msgs.length-1];
-    const preview=last?(last.photo?'📷 Photo':last.text):'Dis bonjour 👋';
+    const isVoice=last&&last.voice;
+    const preview=last?(last.photo?'📷 Photo':isVoice?'🎤 Vocal':last.text):'Dis bonjour 👋';
     const time=last?last.time:'';
     const unread=last&&last.from==='them'&&!last.read;
     const avHTML=makeAv(u.handle,u.name,u.pic||null,52);
     const online=u.lastSeen&&(Date.now()-u.lastSeen<120000);
     const dot=`<div class="av-dot ${online?'on':'off'}" style="position:absolute;bottom:2px;right:2px;"></div>`;
-    return`<div class="ci" onclick="openConvo('${esc(u.handle)}')"><div style="position:relative;flex-shrink:0;">${avHTML}${dot}</div><div class="ci-info"><div class="ci-name">${esc(u.name)}</div><div class="ci-prev${unread?' u':''}">${esc(preview)}</div></div><div class="ci-meta"><span class="ci-time">${time}</span><div class="nbadge ${unread?'r':'g'}">${unread?'▶':'💬'}</div></div></div>`;
+    return`<div class="ci${S.convoId===u.handle?' active':''}" data-handle="${esc(u.handle)}" onclick="openConvo('${esc(u.handle)}')"><div style="position:relative;flex-shrink:0;">${avHTML}${dot}</div><div class="ci-info"><div class="ci-name">${esc(u.name)}</div><div class="ci-prev${unread?' u':''}">${esc(preview)}</div></div><div class="ci-meta"><span class="ci-time">${time}</span><div class="nbadge ${unread?'r':'g'}">${unread?'▶':'💬'}</div></div></div>`;
   }).join('');
 }
 function filterChats(v){renderChats(v);}
 
-function openConvo(handle){
-  const u=USERS[handle];if(!u)return;
-  S.convoId=handle;
-  if(MSGS[handle])MSGS[handle].forEach(m=>{if(m.from==='them')m.read=true;});
-  const avHTML=makeAv(u.handle,u.name,u.pic||null,36);
-  $('convo-hdr').innerHTML=`${avHTML}<div style="min-width:0;"><div class="cname" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(u.name)}</div><div class="cstatus">● En ligne</div></div>`;
-  renderMsgs(handle);go('convo');
-  setTimeout(()=>{try{$('minp').focus();}catch(e){}},400);
-}
-
+/* ═════ MESSAGES ═════ */
 function renderMsgs(handle){
   const el=$('msgs-area');if(!el)return;
   const u=USERS[handle];
   const list=MSGS[handle]||[];
   const theirAv=u?makeAv(u.handle,u.name,u.pic||null,26):'';
   let html='<div class="daylbl">Aujourd\'hui</div>';
-  list.forEach(m=>{
-    if(m.photo){const safe=m.photo.replace(/'/g,'%27');html+=`<div class="mrow ${m.from}">${m.from==='them'?`<div class="mav">${theirAv}</div>`:''}<img class="bphoto" src="${m.photo}" onclick="openFP('${safe}')"></div><div class="btm ${m.from==='me'?'me':''}">${m.time}</div>`;}
-    else{html+=`<div class="mrow ${m.from}">${m.from==='them'?`<div class="mav">${theirAv}</div>`:''}<div class="bub ${m.from}">${esc(m.text)}</div></div><div class="btm ${m.from==='me'?'me':''}">${m.time}</div>`;}
+  list.forEach((m,idx)=>{
+    if(m.photo){
+      const safe=m.photo.replace(/'/g,'%27');
+      html+=`<div class="mrow ${m.from}">${m.from==='them'?`<div class="mav">${theirAv}</div>`:''}<img class="bphoto" src="${m.photo}" onclick="openFP('${safe}')"></div><div class="btm ${m.from==='me'?'me':''}">${m.time}</div>`;
+    } else if(m.voice){
+      const dur=m.voiceDur||'0:05';
+      const bars=Array.from({length:22},(_,i)=>{
+        const h=Math.round(4+Math.random()*18);
+        return`<div class="vbar" style="height:${h}px" data-idx="${i}" data-msgidx="${idx}" data-side="${m.from}"></div>`;
+      }).join('');
+      html+=`<div class="mrow ${m.from}">${m.from==='them'?`<div class="mav">${theirAv}</div>`:''}<div class="voice-bub ${m.from}"><button class="vplay" onclick="playVoice(this,${idx},'${handle}')">▶</button><div class="vinfo"><div class="vwave">${bars}</div><span class="vdur">${dur}</span></div></div></div><div class="btm ${m.from==='me'?'me':''}">${m.time}</div>`;
+    } else {
+      html+=`<div class="mrow ${m.from}">${m.from==='them'?`<div class="mav">${theirAv}</div>`:''}<div class="bub ${m.from}">${esc(m.text)}</div></div><div class="btm ${m.from==='me'?'me':''}">${m.time}</div>`;
+    }
   });
   el.innerHTML=html;
   requestAnimationFrame(()=>el.scrollTop=el.scrollHeight);
 }
 
+/* ═════ VOCAL — Lecture ═════ */
+const voiceBlobs={};
+function playVoice(btn,msgIdx,handle){
+  const msgs=MSGS[handle]||[];
+  const m=msgs[msgIdx];if(!m||!m.voice)return;
+  // Trouver le conteneur
+  const bub=btn.closest('.voice-bub');
+  const bars=bub.querySelectorAll('.vbar');
+  const durEl=bub.querySelector('.vdur');
+  // Si on a le blob enregistré
+  if(voiceBlobs[handle+'_'+msgIdx]){
+    const audio=new Audio(voiceBlobs[handle+'_'+msgIdx]);
+    btn.textContent='⏸';
+    let i=0;
+    const interval=setInterval(()=>{
+      if(i<bars.length){bars[i].classList.add('played');i++;}
+      else{clearInterval(interval);btn.textContent='▶';bars.forEach(b=>b.classList.remove('played'));}
+    },(m.voiceMs||3000)/bars.length);
+    audio.onended=()=>{clearInterval(interval);btn.textContent='▶';bars.forEach(b=>b.classList.remove('played'));};
+    audio.play().catch(()=>{});
+    return;
+  }
+  // Simulation si pas de vrai blob
+  btn.textContent='⏸';
+  let i=0;
+  const total=bars.length;
+  const ms=(m.voiceMs||3000)/total;
+  const interval=setInterval(()=>{
+    if(i<total){bars[i].classList.add('played');i++;}
+    else{clearInterval(interval);btn.textContent='▶';bars.forEach(b=>b.classList.remove('played'));}
+  },ms);
+}
+
+/* ═════ VOCAL — Enregistrement ═════ */
+let mediaRec=null,recChunks=[],recInterval=null,recSec=0;
+
+$('mic-btn').addEventListener('click',()=>{
+  if($('mic-btn').classList.contains('recording')){stopRec();return;}
+  startRec();
+});
+
+async function startRec(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRec=new MediaRecorder(stream);
+    recChunks=[];
+    mediaRec.ondataavailable=e=>{if(e.data.size>0)recChunks.push(e.data);};
+    mediaRec.start(100);
+    recSec=0;
+    $('mic-btn').classList.add('recording');
+    $('mic-btn').textContent='⏹';
+    // Afficher la barre d'enregistrement
+    $('input-bar').style.display='none';
+    $('rec-bar').classList.add('on');
+    buildRecWaves();
+    recInterval=setInterval(()=>{
+      recSec++;
+      const m=Math.floor(recSec/60),s=recSec%60;
+      $('rec-time').textContent=`${m}:${String(s).padStart(2,'0')}`;
+    },1000);
+  }catch{
+    toast('🎤 Micro non disponible');
+  }
+}
+
+function stopRec(){
+  if(mediaRec&&mediaRec.state!=='inactive')mediaRec.stop();
+  mediaRec&&mediaRec.stream.getTracks().forEach(t=>t.stop());
+  clearInterval(recInterval);
+  $('mic-btn').classList.remove('recording');
+  $('mic-btn').textContent='🎤';
+}
+
+function cancelRec(){
+  stopRec();
+  recChunks=[];
+  $('rec-bar').classList.remove('on');
+  $('input-bar').style.display='flex';
+  $('rec-waves').innerHTML='';
+}
+
+function sendVoice(){
+  if(!S.convoId)return;
+  stopRec();
+  const hdl=S.convoId;
+  const m=Math.floor(recSec/60),s=recSec%60;
+  const dur=`${m}:${String(s).padStart(2,'0')}`;
+  const ms=recSec*1000||3000;
+  const msgIdx=(MSGS[hdl]||[]).length;
+
+  if(!MSGS[hdl])MSGS[hdl]=[];
+  MSGS[hdl].push({from:'me',voice:true,voiceDur:dur,voiceMs:ms,time:nowStr(),read:true});
+
+  // Stocker le blob si dispo
+  if(recChunks.length>0){
+    const blob=new Blob(recChunks,{type:'audio/webm'});
+    voiceBlobs[hdl+'_'+msgIdx]=URL.createObjectURL(blob);
+  }
+  recChunks=[];
+
+  $('rec-bar').classList.remove('on');
+  $('input-bar').style.display='flex';
+  $('rec-waves').innerHTML='';
+
+  S.score+=8;
+  renderMsgs(hdl);renderChats();saveState();
+  toast('🎤 Vocal envoyé !');
+  autoReply(hdl);
+}
+
+function buildRecWaves(){
+  const el=$('rec-waves');
+  el.innerHTML='';
+  for(let i=0;i<28;i++){
+    const d=document.createElement('div');
+    d.className='rw';
+    const del=(i*0.04)+'s';
+    d.style.cssText=`animation:wave-anim 0.${4+Math.floor(Math.random()*4)}s ease-in-out infinite;animation-delay:${del};height:4px;`;
+    el.appendChild(d);
+  }
+}
+
+/* ═════ ENVOYER TEXTE ═════ */
 function sendMsg(){
   const inp=$('minp');if(!inp)return;
   const text=inp.value.trim();if(!text||!S.convoId)return;
   const hdl=S.convoId,t=nowStr();
   if(!MSGS[hdl])MSGS[hdl]=[];
   MSGS[hdl].push({from:'me',text,time:t,read:true});
-  inp.value='';S.score+=5;
+  inp.value='';
+  updateSendBtn();
+  S.score+=5;
   renderMsgs(hdl);renderChats();saveState();
   autoReply(hdl);
 }
 
+/* Afficher micro ou envoyer selon contenu */
+function updateSendBtn(){
+  const hasText=$('minp').value.trim().length>0;
+  $('sbtn').style.display=hasText?'flex':'none';
+  $('mic-btn').style.display=hasText?'none':'flex';
+}
+$('minp').addEventListener('input',updateSendBtn);
+
 const REPLIES=['😂','Hahaha !','Trop drôle 💀','Ok je vois 👀','🔥🔥','Exactement !','Wesh !','💯','Oh non 😭','Trop bien !','Attends 📸','Trop fort !!','Allez 🙌','👀','lol','C\'est chaud 🥶','GG !!','Ah ouais !','😭','Non sérieux ??'];
-function autoReply(hdl){const delay=900+Math.floor(Math.random()*1100);setTimeout(()=>showTyping(hdl),delay-350);setTimeout(()=>{hideTyping();const rep=REPLIES[Math.floor(Math.random()*REPLIES.length)];if(!MSGS[hdl])return;MSGS[hdl].push({from:'them',text:rep,time:nowStr(),read:false});if(S.convoId===hdl)renderMsgs(hdl);renderChats();saveState();},delay);}
+const VOICE_REPLIES=['🎤 Vocal reçu !','Écoute ça 👂','Réponds-moi en vocal 😁','Tu as entendu ??','🎤','Mdr ce vocal 😂'];
+
+function autoReply(hdl){
+  const delay=900+Math.floor(Math.random()*1100);
+  setTimeout(()=>showTyping(hdl),delay-350);
+  setTimeout(()=>{
+    hideTyping();
+    if(!MSGS[hdl])return;
+    // Parfois répondre par un vocal simulé
+    if(Math.random()<0.15){
+      const dur=`0:0${2+Math.floor(Math.random()*7)}`;
+      MSGS[hdl].push({from:'them',voice:true,voiceDur:dur,voiceMs:parseInt(dur.split(':')[1])*1000,time:nowStr(),read:false});
+    } else {
+      const rep=REPLIES[Math.floor(Math.random()*REPLIES.length)];
+      MSGS[hdl].push({from:'them',text:rep,time:nowStr(),read:false});
+    }
+    if(S.convoId===hdl)renderMsgs(hdl);
+    renderChats();saveState();
+  },delay);
+}
 function showTyping(hdl){if(S.convoId!==hdl)return;const el=$('msgs-area');if(!el)return;const u=USERS[hdl];const avHTML=u?makeAv(u.handle,u.name,u.pic||null,26):'';const row=document.createElement('div');row.id='typr';row.className='typing-row';row.innerHTML=`<div class="mav">${avHTML}</div><div class="tdots"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;el.appendChild(row);el.scrollTop=el.scrollHeight;}
 function hideTyping(){const e=$('typr');if(e)e.remove();}
 
@@ -707,9 +1054,8 @@ function pickCat(el){document.querySelectorAll('.cpill').forEach(b=>b.classList.
 function openFP(src){$('fp-img').src=src;$('fp').classList.add('on');}
 function closeFP(){$('fp').classList.remove('on');}
 
-// Bouton envoyer — direct, sans DOMContentLoaded
-$('sbtn').onclick = function(e){ e.preventDefault(); sendMsg(); };
-$('minp').onkeydown = function(e){ if(e.key==='Enter'){ e.preventDefault(); sendMsg(); } };
+$('sbtn').addEventListener('click',e=>{e.preventDefault();sendMsg();});
+$('minp').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendMsg();}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeFP();closeStory();}});
 
 setInterval(()=>{if(ME&&!ME.demo)refreshUsers();},30000);
