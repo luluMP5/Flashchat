@@ -58,7 +58,8 @@ button,input{font-family:inherit;border:none;outline:none;}
 .ci-time{font-size:.7rem;color:#444;}
 .nbadge{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.67rem;}
 .nbadge.r{background:#FF3B3B;}.nbadge.g{background:#1a1a1a;color:#444;}
-#s-convo{background:#000;}
+#s-convo{background:#000;display:none;-webkit-flex-direction:column;flex-direction:column;position:absolute;inset:0;overflow:hidden;}
+#s-convo.on{display:-webkit-flex;display:flex;}
 .cbar{padding:50px 14px 10px;display:flex;align-items:center;gap:9px;flex-shrink:0;border-bottom:1px solid #111;}
 .bkbtn{width:36px;height:36px;border-radius:50%;background:#111;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .bkbtn:active{background:#1a1a1a;}
@@ -68,7 +69,7 @@ button,input{font-family:inherit;border:none;outline:none;}
 .cstatus{font-size:.72rem;color:#00D26A;font-weight:600;}
 .cacts{display:flex;gap:6px;margin-left:auto;}
 .cact{width:34px;height:34px;border-radius:50%;background:#111;color:#fff;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.msgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 8px;display:flex;flex-direction:column;gap:3px;min-height:0;}
+.msgs{-webkit-flex:1;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 8px;display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;gap:3px;min-height:0;}
 .msgs::-webkit-scrollbar{display:none;}
 .daylbl{text-align:center;font-size:.64rem;color:#333;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:6px 0;}
 .mrow{display:flex;align-items:flex-end;gap:6px;}
@@ -86,12 +87,50 @@ button,input{font-family:inherit;border:none;outline:none;}
 .td{width:6px;height:6px;border-radius:50%;background:#444;animation:tda 1.2s infinite;}
 .td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
 @keyframes tda{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
-.ibar{display:flex;align-items:center;gap:8px;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom,10px));background:#0d0d0d;flex-shrink:0;border-top:1px solid #111;position:relative;z-index:10;}
-.imbtn{width:38px;height:38px;border-radius:50%;background:#111;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.imbtn:active{background:#1a1a1a;}
-.minp{flex:1;background:#1a1a1a;border-radius:22px;padding:11px 16px;color:#fff;font-size:.87rem;font-weight:600;min-width:0;-webkit-appearance:none;}
-.minp::placeholder{color:#333;}
-.sbtn{width:44px;height:44px;border-radius:50%;background:#FFFC00;color:#000;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:900;transition:all .12s;-webkit-appearance:none;}
+.ibar{
+  display:-webkit-flex;display:flex;
+  -webkit-align-items:center;align-items:center;
+  gap:8px;
+  padding:10px 12px 10px;
+  padding-bottom:max(10px,env(safe-area-inset-bottom,10px));
+  background:#0d0d0d;
+  -webkit-flex-shrink:0;flex-shrink:0;
+  border-top:1px solid #222;
+  position:relative;z-index:10;
+  min-height:64px;
+  width:100%;
+}
+.imbtn{
+  width:38px;height:38px;border-radius:50%;
+  background:#1a1a1a;color:#fff;font-size:1rem;cursor:pointer;
+  display:-webkit-flex;display:flex;
+  -webkit-align-items:center;align-items:center;
+  -webkit-justify-content:center;justify-content:center;
+  -webkit-flex-shrink:0;flex-shrink:0;
+  border:none;
+}
+.imbtn:active{background:#252525;}
+.minp{
+  -webkit-flex:1;flex:1;
+  background:#1a1a1a;border-radius:22px;
+  padding:11px 16px;color:#fff;
+  font-size:16px;font-weight:600;
+  min-width:0;border:none;outline:none;
+  -webkit-appearance:none;appearance:none;
+  display:block;
+}
+.minp::placeholder{color:#444;}
+.sbtn{
+  width:44px;height:44px;border-radius:50%;
+  background:#FFFC00;color:#000;font-size:1.2rem;cursor:pointer;
+  display:-webkit-flex;display:flex;
+  -webkit-align-items:center;align-items:center;
+  -webkit-justify-content:center;justify-content:center;
+  -webkit-flex-shrink:0;flex-shrink:0;
+  font-weight:900;border:none;outline:none;
+  -webkit-appearance:none;appearance:none;
+  transition:all .12s;
+}
 .sbtn:active{transform:scale(.88);background:#d4d000;}
 #s-cam{background:#000;overflow:hidden;}
 #cvid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
