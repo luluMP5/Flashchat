@@ -399,7 +399,7 @@ button,input{font-family:inherit;border:none;outline:none;}
      /accounts/{handle} → { name, handle, pwh, pic, lastSeen }
 ═══════════════════════════════════════════════════════════════ */
 
-const DB = 'https://flashchat-lulump5-default-rtdb.europe-west1.firebasedatabase.io';
+const DB = 'https://flashchat-4236d-default-rtdb.europe-west1.firebasedatabase.app';
 
 async function fbGet(p) {
   try { const r=await fetch(`${DB}/${p}.json`); return r.ok?await r.json():null; }
